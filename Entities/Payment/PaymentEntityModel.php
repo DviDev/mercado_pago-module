@@ -1,0 +1,26 @@
+<?php
+
+namespace Modules\MercadoPago\Entities\Payment;
+
+use Modules\Base\Entities\BaseEntityModel;
+use Modules\MercadoPago\Repositories\PaymentRepository;
+use Modules\MercadoPago\Models\PaymentModel;
+
+/**
+ * @author Davi Menezes (davimenezes.dev@gmail.com)
+ * @link https://github.com/DaviMenezes
+ * @property-read PaymentModel $model
+ * @method self save()
+ * @method static self new()
+ * @method static self props($alias = null, $force = null)
+ * @method PaymentRepository repository()
+ */
+class PaymentEntityModel extends BaseEntityModel
+{
+    use PaymentProps;
+
+    protected function repositoryClass(): string
+    {
+        return PaymentRepository::class;
+    }
+}
