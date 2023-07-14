@@ -15,7 +15,7 @@ use Modules\Store\Models\OrderModel;
  * @link https://github.com/DaviMenezes
  * @property-read OrderModel $order
  * @method PreferenceEntityModel toEntity()
- * @method PreferenceFactory factory()
+ * @method PreferenceFactory factory($count = null, $state = [])
  */
 class PreferenceModel extends BaseModel
 {

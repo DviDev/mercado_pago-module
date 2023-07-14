@@ -198,7 +198,7 @@ class PaymentStatusSuccessController extends Controller
 
                 DB::commit();
 
-                session()->flash('success', 'Parabéns seus pagamento foi aprovado. Os alunos estão sendo matriculados');
+                session()->flash('success', 'Parabéns seus pagamento foi aprovado.');
 
                 return redirect()->route('order', $order->id);
             }

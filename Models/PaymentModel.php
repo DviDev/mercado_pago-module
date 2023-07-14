@@ -15,7 +15,7 @@ use Modules\Store\Models\OrderModel;
  * @link https://github.com/DaviMenezes
  * @property-read OrderModel $order
  * @method PaymentEntityModel toEntity()
- * @method PaymentFactory factory()
+ * @method PaymentFactory factory($count = null, $state = [])
  */
 class PaymentModel extends BaseModel
 {

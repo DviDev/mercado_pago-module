@@ -12,7 +12,7 @@ use Modules\MercadoPago\Entities\UrlNotification\UrlNotificationProps;
  * @author Davi Menezes (davimenezes.dev@gmail.com)
  * @link https://github.com/DaviMenezes
  * @method UrlNotificationEntityModel toEntity()
- * @method UrlNotificationFactory factory()
+ * @method UrlNotificationFactory factory($count = null, $state = [])
  */
 class UrlNotificationModel extends BaseModel
 {

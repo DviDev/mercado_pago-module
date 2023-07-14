@@ -14,7 +14,7 @@ use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationProps;
  * @link https://github.com/DaviMenezes
  * @property-read PaymentModel $payment
  * @method WebhookNotificationEntityModel toEntity()
- * @method WebhookNotificationFactory factory()
+ * @method WebhookNotificationFactory factory($count = null, $state = [])
  */
 class WebhookNotificationModel extends BaseModel
 {
