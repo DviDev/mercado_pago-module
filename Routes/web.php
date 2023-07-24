@@ -12,5 +12,5 @@
 */
 
 Route::prefix('mercadopago')->group(function() {
-    Route::get('/', 'MercadoPagoController@index');
+
 });
