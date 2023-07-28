@@ -3,6 +3,7 @@
 namespace Modules\MercadoPago\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Modules\Base\Factories\BaseFactory;
 use Modules\MercadoPago\Models\UrlNotificationModel;
 use Modules\MercadoPago\Entities\UrlNotification\UrlNotificationEntityModel;
 
@@ -10,7 +11,7 @@ use Modules\MercadoPago\Entities\UrlNotification\UrlNotificationEntityModel;
  * @method UrlNotificationModel create(array $attributes = [])
  * @method UrlNotificationModel make(array $attributes = [])
  */
-class UrlNotificationFactory extends Factory
+class UrlNotificationFactory extends BaseFactory
 {
     /**
      * The name of the factory's corresponding model.
