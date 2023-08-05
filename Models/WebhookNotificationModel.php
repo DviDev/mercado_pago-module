@@ -4,6 +4,7 @@ namespace Modules\MercadoPago\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Modules\Base\Factories\BaseFactory;
 use Modules\Base\Models\BaseModel;
 use Modules\MercadoPago\Database\Factories\WebhookNotificationFactory;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationEntityModel;
@@ -38,9 +39,11 @@ class WebhookNotificationModel extends BaseModel
         return self::dbTable('mp_webhook_notifications', $alias);
     }
 
-    protected static function newFactory(): WebhookNotificationFactory
+    protected static function newFactory(): BaseFactory
     {
-        return new WebhookNotificationFactory();
+        return new class extends BaseFactory {
+            protected $model = WebhookNotificationModel::class;
+        };
     }
 
     public function modelEntity(): string

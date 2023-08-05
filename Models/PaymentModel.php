@@ -4,6 +4,7 @@ namespace Modules\MercadoPago\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Base\Factories\BaseFactory;
 use Modules\Base\Models\BaseModel;
 use Modules\MercadoPago\Database\Factories\PaymentFactory;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
@@ -54,9 +55,11 @@ class PaymentModel extends BaseModel
         return $payment;
     }
 
-    protected static function newFactory(): PaymentFactory
+    protected static function newFactory(): BaseFactory
     {
-        return new PaymentFactory();
+        return new class extends BaseFactory {
+            protected $model = PaymentModel::class;
+        };
     }
 
     public function modelEntity(): string

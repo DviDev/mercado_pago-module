@@ -4,6 +4,7 @@ namespace Modules\MercadoPago\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Base\Factories\BaseFactory;
 use Modules\Base\Models\BaseModel;
 use Modules\MercadoPago\Database\Factories\PreferenceFactory;
 use Modules\MercadoPago\Entities\Preference\PreferenceEntityModel;
@@ -36,9 +37,11 @@ class PreferenceModel extends BaseModel
         ])->first();
     }
 
-    protected static function newFactory(): PreferenceFactory
+    protected static function newFactory(): BaseFactory
     {
-        return new PreferenceFactory();
+        return new class extends BaseFactory {
+            protected $model = PreferenceModel::class;
+        };
     }
 
     public function modelEntity(): string

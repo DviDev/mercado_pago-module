@@ -3,6 +3,7 @@
 namespace Modules\MercadoPago\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Base\Factories\BaseFactory;
 use Modules\Base\Models\BaseModel;
 use Modules\MercadoPago\Database\Factories\UrlNotificationFactory;
 use Modules\MercadoPago\Entities\UrlNotification\UrlNotificationEntityModel;
@@ -38,9 +39,11 @@ class UrlNotificationModel extends BaseModel
         return self::dbTable('mp_back_url_notifications', $alias);
     }
 
-    protected static function newFactory(): UrlNotificationFactory
+    protected static function newFactory(): BaseFactory
     {
-        return new UrlNotificationFactory();
+        return new class extends BaseFactory {
+            protected $model = UrlNotificationModel::class;
+        };
     }
 
     public function modelEntity(): string
