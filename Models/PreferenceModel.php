@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Base\Factories\BaseFactory;
 use Modules\Base\Models\BaseModel;
-use Modules\MercadoPago\Database\Factories\PreferenceFactory;
 use Modules\MercadoPago\Entities\Preference\PreferenceEntityModel;
 use Modules\MercadoPago\Entities\Preference\PreferenceProps;
 use Modules\Store\Models\OrderModel;
@@ -16,7 +15,6 @@ use Modules\Store\Models\OrderModel;
  * @link https://github.com/DaviMenezes
  * @property-read OrderModel $order
  * @method PreferenceEntityModel toEntity()
- * @method PreferenceFactory factory($count = null, $state = [])
  */
 class PreferenceModel extends BaseModel
 {

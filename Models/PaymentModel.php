@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Base\Factories\BaseFactory;
 use Modules\Base\Models\BaseModel;
-use Modules\MercadoPago\Database\Factories\PaymentFactory;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 use Modules\MercadoPago\Entities\Payment\PaymentProps;
 use Modules\Store\Models\OrderModel;
@@ -16,7 +15,6 @@ use Modules\Store\Models\OrderModel;
  * @link https://github.com/DaviMenezes
  * @property-read OrderModel $order
  * @method PaymentEntityModel toEntity()
- * @method PaymentFactory factory($count = null, $state = [])
  */
 class PaymentModel extends BaseModel
 {

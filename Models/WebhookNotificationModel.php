@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Modules\Base\Factories\BaseFactory;
 use Modules\Base\Models\BaseModel;
-use Modules\MercadoPago\Database\Factories\WebhookNotificationFactory;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationEntityModel;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationProps;
 
@@ -15,7 +14,6 @@ use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationProps;
  * @link https://github.com/DaviMenezes
  * @property-read PaymentModel $payment
  * @method WebhookNotificationEntityModel toEntity()
- * @method WebhookNotificationFactory factory($count = null, $state = [])
  */
 class WebhookNotificationModel extends BaseModel
 {
