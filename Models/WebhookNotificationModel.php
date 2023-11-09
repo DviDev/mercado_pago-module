@@ -20,6 +20,8 @@ class WebhookNotificationModel extends BaseModel
     use HasFactory;
     use WebhookNotificationProps;
 
+    protected $casts = ['live_mode' => 'boolean'];
+
     protected $fillable = [
         'action',
         'api_version',

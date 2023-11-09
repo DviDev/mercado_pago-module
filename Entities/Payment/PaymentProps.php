@@ -6,6 +6,7 @@ namespace Modules\MercadoPago\Entities\Payment;
  * @property $id
  * @property $mp_id
  * @property $collector_id
+ * @property $external_reference
  * @property $date_approved
  * @property $date_created
  * @property $description

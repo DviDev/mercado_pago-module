@@ -37,21 +37,19 @@ class PaymentStatusSuccessController extends Controller
     public function payment()
     {
         $data = \request()->all();
-
         //when check url in webhook portal of mp
-        if ($data['type'] == 'test') {
+        /*if ($data['type'] == 'test') {
             return response()->json(true);
-        }
+        }*/
 
         if (!$this->createWebhookNotification($data)) {
             return response()->json(false, 500);
         }
-
         //Todo todo o processamento abaixo poderia rodar em segundo plano para liberar a requisicao.
         //Para isso um processo de supervisão da fila (como o supervisor) precisa ser configurado
+        //Todo devemos guardar as informações do mp e analisar posteriormente
         try {
             $api_data = $this->getApiPaymentData($this->WebhookNotification->data_id);
-
             $order_id = str($api_data['additional_info']['items'][0]['id'])->explode('#')->first();
             $order = (new OrderRepository())->find($order_id);
             $this->payment = (new OrderStatusService)->getPayment(
@@ -59,11 +57,14 @@ class PaymentStatusSuccessController extends Controller
                 $this->WebhookNotification->data_id,
                 $this->WebhookNotification->id);
 
-            if ($this->payment->order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
-                if (config('app.env') == 'local') {
-                    ds('Ordem já está paga');
+            if ($this->payment->order->lastStatus()) {
+                if($this->payment->order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
+                    if (config('app.env') == 'local') {
+                        Log::info('Ordem já está paga');
+                    }
+                    return response()->json(true);
+
                 }
-                return response()->json(true);
             }
 
             if ((new OrderStatusService($this->payment))->checkStatus()) {
@@ -89,6 +90,7 @@ class PaymentStatusSuccessController extends Controller
         try {
             $data['data_id'] = $data['data']['id'];
             $data['mp_id'] = $data['id'];
+            $data['live_mode'] = (boolean)$data['live_mode'];
 
             $this->WebhookNotification = WebhookNotificationModel::query()
                 ->updateOrCreate([
@@ -99,29 +101,28 @@ class PaymentStatusSuccessController extends Controller
                 ], $data);
             return true;
         } catch (Exception $exception) {
-           User::find(2)->notify(new PaymentStatusNotification(
-                title: 'Houve um erro ao gravar retorno do de webhook do mercado pago',
-                description: $exception->getMessage(). ' - '. json_encode($data)
-            ));
             Log::error('Houve um erro ao gravar retorno do de webhook do mercado pago');
             Log::info(json_encode($data));
             Log::info($exception->getMessage());
             Log::debug($exception);
+//            User::find(2)->notify(new PaymentStatusNotification(
+//                title: 'Houve um erro ao gravar retorno do de webhook do mercado pago',
+//                description: $exception->getMessage(). ' - '. json_encode($data)
+//            ));
             return false;
         }
     }
 
     protected function getApiPaymentData($payment_id): array
     {
-        $access_token = config("MP_ACCESS_TOKEN");
+        $access_token = config("mercadopago.access_token");
         $data = (new HttpPaymentService($access_token))->run($payment_id);
-
         if (!$data->failed()) {
             return $data->json();
         }
         $msg = "MercadoPago: Registro {$this->WebhookNotification->data_id} não encontrado.";
         if (config('app.env') == 'local') {
-            $msg .= ' token:' . config("MP_ACCESS_TOKEN");
+            $msg .= ' token:' . config("mercadopago.access_token");
         }
         throw new Exception($msg);
     }

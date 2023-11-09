@@ -49,7 +49,7 @@ class PaymentDomain extends BaseDomain
 
     public function getConfig(OrderModel $order): string|null
     {
-        return config("MP_ACCESS_TOKEN");
+        return config("mercadopago.access_token");
     }
 
     public function checkInProgress(OrderModel $order, PreferenceModel $preference)
@@ -82,7 +82,7 @@ class PaymentDomain extends BaseDomain
             ->whereDate($p->created_at, '>=', $date)
             ->groupBy($p->id, $p->data_id)
             ->each(function (WebhookNotificationModel $m) {
-                $data = (new HttpPaymentService(config("MP_ACCESS_TOKEN")))->run($m->data_id);
+                $data = (new HttpPaymentService(config("mercadopago.access_token")))->run($m->data_id);
                 $external_reference = $data->json('external_reference');
                 $order_id = str($external_reference)->explode('-')->last();
 

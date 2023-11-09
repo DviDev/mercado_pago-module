@@ -54,10 +54,10 @@ class OrderStatusService
             return false;
         }
         $order = $this->payment->order;
-        if ($order->lastStatusEnum() == OrderStatusTypeEnum::in_process) {
+        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::in_process) {
             return false;
         }
-        if ($order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
+        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
             return false;
         }
 
@@ -76,7 +76,7 @@ class OrderStatusService
         }
 
         $order = $this->payment->order;
-        if ($order->lastStatusEnum() == OrderStatusTypeEnum::in_process) {
+        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::in_process) {
             return false;
         }
 
@@ -99,7 +99,7 @@ class OrderStatusService
 
         $order = $this->payment->order;
 
-        if ($order->lastStatusEnum() == OrderStatusTypeEnum::rejected) {
+        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::rejected) {
             return false;
         }
 
@@ -118,14 +118,12 @@ class OrderStatusService
         }
 
         $order = $this->payment->order;
-        if ($order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
+        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
             return false;
         }
 
         $description = $this->payment->getDescription();
         $this->addStatus($order, OrderStatusTypeEnum::paid, $description);
-
-
 
         $this->notify($order, 'Seu pagamento foi aprovado!', $description);
 
@@ -155,13 +153,8 @@ class OrderStatusService
         $payment = PaymentModel::makeViaApiData($data);
         $description = 'OFI[';
         $items = $order->items;
-        foreach ($items as $key => $item) {
-            $description .= $item->product_id;
-            if ($key < count($items)) {
-                $description .= ',';
-            }
-        }
-        $description .=']';
+        $products = $items->map(fn($i) => $i->product_id)->join(',');
+        $description .= $products.']';
         $payment->description = $description . '-'.$data['description'];
         $payment->order_id = $order->id;
         $payment->notification_id = $notification_id ?? null;
@@ -177,7 +170,7 @@ class OrderStatusService
         }
 
         $order = $this->payment->order;
-        if ($order->lastStatusEnum() == OrderStatusTypeEnum::canceled) {
+        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::canceled) {
             return false;
         }
 

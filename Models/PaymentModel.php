@@ -21,6 +21,8 @@ class PaymentModel extends BaseModel
     use HasFactory;
     use PaymentProps;
 
+    protected $casts = ['created_at' => 'datetime'];
+
     public static function table($alias = null): string
     {
         return self::dbTable('mp_payments', $alias);
@@ -37,6 +39,7 @@ class PaymentModel extends BaseModel
         $p = PaymentEntityModel::props(null, true);
         $payment = new PaymentModel();
         $payment->mp_id = $data[$p->id];
+        $payment->external_reference = $data[$p->external_reference];
         $payment->collector_id = $data[$p->collector_id];
         $payment->date_approved = $data[$p->date_approved];
         $payment->date_created = $data[$p->date_created];
