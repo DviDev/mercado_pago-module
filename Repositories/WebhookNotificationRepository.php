@@ -1,0 +1,29 @@
+<?php
+
+namespace Modules\MercadoPago\Repositories;
+
+use Modules\Base\Repository\BaseRepository;
+use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationEntityModel;
+use Modules\MercadoPago\Models\WebhookNotificationModel;
+
+/**
+ * @author Davi Menezes(davimenezes.dev@gmail.com)
+ * @link https://github.com/DaviMenezes
+ * @method self obj()
+ * @method WebhookNotificationModel model()
+ * @method WebhookNotificationEntityModel find($id)
+ * @method WebhookNotificationModel first()
+ * @method WebhookNotificationModel findOrNew($id)
+ * @method WebhookNotificationModel firstOrNew($query)
+ * @method WebhookNotificationEntityModel findOrFail($id)
+ */
+class WebhookNotificationRepository extends BaseRepository
+{
+    /**
+     * @inheritDoc
+     */
+    public function modelClass(): string
+    {
+        return WebhookNotificationModel::class;
+    }
+}

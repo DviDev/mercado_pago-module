@@ -1,10 +1,10 @@
 {
-    "name": "nwidart/mercadopago",
-    "description": "",
+    "name": "dvidev/mercadopago",
+    "description": "Modulo laravel para gerenciar pagamentos via MercadoPago",
     "authors": [
         {
-            "name": "Nicolas Widart",
-            "email": "n.widart@gmail.com"
+            "name": "Davi Menezes",
+            "email": "davimenezes.dev@gmail.com"
         }
     ],
     "extra": {
