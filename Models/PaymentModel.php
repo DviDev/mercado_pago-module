@@ -89,10 +89,4 @@ class PaymentModel extends BaseModel
             default => $this->status_detail
         };
     }
-
-    public function getGuarded(): array
-    {
-        $p = PaymentEntityModel::props();
-        return collect($p->toArray())->except([$p->id, $p->created_at])->toArray();
-    }
 }
