@@ -18,6 +18,9 @@ namespace Modules\MercadoPago\Entities\Payment;
  * @property $transaction_details_installment_amount
  * @property $transaction_details_net_received_amount
  * @property $transaction_details_total_paid_amount
+ * @property $transaction_details_external_resource_url
+ * @property $transaction_details_digitable_line
+ * @property $transaction_details_barcode_content
  * @property $payment_method_id
  * @property $payment_type_id
  * @property $notification_id
