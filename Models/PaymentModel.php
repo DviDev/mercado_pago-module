@@ -129,38 +129,41 @@ class PaymentModel extends BaseModel
         };
     }
 
-    public function gerarPix(PropostaModel $proposta)
+    public function gerarPix(
+                             $order_id,
+                             $amount,
+                             $idempotency_key,
+                             $customer_name, $customer_email, $customer_cpf, $description)
     {
         MercadoPagoConfig::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN_PROD'));
 
         $client = new PaymentClient();
         $request_options = new RequestOptions();
-        $request_options->setCustomHeaders(["X-Idempotency-Key: ".$proposta->uuid]);
+        $request_options->setCustomHeaders(["X-Idempotency-Key: ".$idempotency_key]);
 
-        $customer = $proposta->customer;
-        $name_array = str($customer->user->name)->explode(' ');
+        $name_array = str($customer_name)->explode(' ');
         $first_name = $name_array->shift();
         $last_name = $name_array->join(' ');
 
         $payment = $client->create([
-            "transaction_amount" => $proposta->premioTotal(),
+            "transaction_amount" => $amount,
             "token" => env('MERCADO_PAGO_ACCESS_TOKEN_PROD'),
-            "description" => 'Seguro - Evento '.$proposta->evento->nome,
+            "description" => $description,
             "installments" => 1,
             "payment_method_id" => 'pix',
             "issuer_id" => 2006,
             "payer" => [
-                "email" => $customer->user->email,
+                "email" => $customer_email,
                 "first_name" => $first_name,
                 "last_name" => $last_name,
                 "identification" => [
                     "type" => 'CPF',
-                    "number" => $customer->person->human->cpf
+                    "number" => $customer_cpf
                 ]
             ]
         ], $request_options);
 
-        PaymentModel::createViaPaymentMercadoPago($payment, $proposta->defaultOrder()->id);
+        PaymentModel::createViaPaymentMercadoPago($payment, $order_id);
 
         return $payment->point_of_interaction->transaction_data->qr_code_base64;
     }
