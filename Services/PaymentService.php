@@ -10,7 +10,7 @@ use MercadoPago\Resources\Payment;
 
 class PaymentService
 {
-    public static function createPayment($amount, $idempotency, User $customer, $description): Payment
+    public static function createBoleto($amount, $idempotency, User $customer, $description): Payment
     {
         MercadoPagoConfig::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN_PROD'));
 

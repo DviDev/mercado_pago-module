@@ -165,6 +165,15 @@ class PaymentModel extends BaseModel
 
         PaymentModel::createViaPaymentMercadoPago($payment, $order_id);
 
-        return $payment->point_of_interaction->transaction_data->qr_code_base64;
+        return $payment;
+    }
+
+    public function getMpPayment(): Payment
+    {
+        MercadoPagoConfig::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN_PROD'));
+        $client = new PaymentClient();
+//        $request_options = new RequestOptions();
+//        $request_options->setCustomHeaders(["X-Idempotency-Key: ".$idempotency_key]);
+        return $client->get($this->mp_id);
     }
 }
