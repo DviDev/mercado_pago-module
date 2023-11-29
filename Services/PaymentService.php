@@ -12,7 +12,7 @@ class PaymentService
 {
     public static function createBoleto($amount, $idempotency, User $customer, $description): Payment
     {
-        MercadoPagoConfig::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN_PROD'));
+        MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
 
         $client = new PaymentClient();
         $request_options = new RequestOptions();
@@ -24,7 +24,7 @@ class PaymentService
         $address = $customer->person->address();
         return $client->create([
             "transaction_amount" => $amount,
-            "token" => env('MERCADO_PAGO_ACCESS_TOKEN_PROD'),
+            "token" => config('mercadopago.access_token'),
             "description" => $description,
             "installments" => 1,
             "payment_method_id" => 'bolbradesco',

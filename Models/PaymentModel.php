@@ -135,7 +135,7 @@ class PaymentModel extends BaseModel
                              $idempotency_key,
                              $customer_name, $customer_email, $customer_cpf, $description)
     {
-        MercadoPagoConfig::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN_PROD'));
+        MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
 
         $client = new PaymentClient();
         $request_options = new RequestOptions();
@@ -147,7 +147,7 @@ class PaymentModel extends BaseModel
 
         $payment = $client->create([
             "transaction_amount" => $amount,
-            "token" => env('MERCADO_PAGO_ACCESS_TOKEN_PROD'),
+            "token" => config('mercadopago.access_token'),
             "description" => $description,
             "installments" => 1,
             "payment_method_id" => 'pix',
@@ -170,10 +170,8 @@ class PaymentModel extends BaseModel
 
     public function getMpPayment(): Payment
     {
-        MercadoPagoConfig::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN_PROD'));
+        MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
         $client = new PaymentClient();
-//        $request_options = new RequestOptions();
-//        $request_options->setCustomHeaders(["X-Idempotency-Key: ".$idempotency_key]);
         return $client->get($this->mp_id);
     }
 }
