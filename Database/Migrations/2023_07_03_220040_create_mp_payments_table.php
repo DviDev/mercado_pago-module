@@ -20,6 +20,16 @@ return new class extends Migration
 
             $table->bigInteger($p->mp_id);
             $table->bigInteger($p->collector_id);
+            $table->char($p->payment_method_id);
+            $table->char($p->payment_type_id);
+            $table->foreignId($p->notification_id)->nullable()->references('id')->on('mp_webhook_notifications')
+                ->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('preference_id')->nullable()->references('id')->on('mp_preferences')
+                ->cascadeOnUpdate()->restrictOnDelete();
+
+            $table->foreignId($p->order_id)->nullable()->references('id')->on('store_orders')
+                ->cascadeOnUpdate()->restrictOnDelete();
+
             $table->string($p->date_approved)->nullable();
             $table->string($p->date_created)->nullable();
             $table->string($p->description);
@@ -31,15 +41,6 @@ return new class extends Migration
             $table->decimal($p->transaction_details_installment_amount)->unsigned()->nullable();
             $table->decimal($p->transaction_details_net_received_amount)->unsigned()->nullable();
             $table->decimal($p->transaction_details_total_paid_amount)->unsigned()->nullable();
-            $table->char($p->payment_method_id);
-            $table->char($p->payment_type_id);
-            $table->foreignId($p->notification_id)->nullable()->references('id')->on('mp_webhook_notifications')
-                ->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreignId('preference_id')->nullable()->references('id')->on('mp_preferences')
-                ->cascadeOnUpdate()->restrictOnDelete();
-
-            $table->foreignId($p->order_id)->nullable()->references('id')->on('store_orders')
-                ->cascadeOnUpdate()->restrictOnDelete();
 
             $table->timestamp($p->created_at)->nullable();
         });
