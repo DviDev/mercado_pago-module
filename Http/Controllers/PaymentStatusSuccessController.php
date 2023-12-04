@@ -27,6 +27,7 @@ use Modules\Store\Models\CartModel;
 use Modules\Store\Models\OrderModel;
 use Modules\Store\Notifications\NotificationInvoice;
 use Modules\Store\Repositories\OrderRepository;
+use SebastianBergmann\LinesOfCode\LinesOfCode;
 
 class PaymentStatusSuccessController extends Controller
 {
@@ -45,7 +46,7 @@ class PaymentStatusSuccessController extends Controller
         if (!$this->createWebhookNotification($data)) {
             return response()->json(false, 500);
         }
-        //Todo todo o processamento abaixo poderia rodar em segundo plano para liberar a requisicao.
+        //Todo todo o processamento abaixo pode rodar em segundo plano para liberar a requisicao se necessario.
         //Para isso um processo de supervisão da fila (como o supervisor) precisa ser configurado
         //Todo devemos guardar as informações do mp e analisar posteriormente
         try {
@@ -56,16 +57,6 @@ class PaymentStatusSuccessController extends Controller
                 $order,
                 $this->WebhookNotification->data_id,
                 $this->WebhookNotification->id);
-
-            if ($this->payment->order->lastStatus()) {
-                if($this->payment->order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
-                    if (config('app.env') == 'local') {
-                        Log::info('Ordem já está paga');
-                    }
-                    return response()->json(true);
-
-                }
-            }
 
             if ((new OrderStatusService($this->payment))->checkStatus()) {
                 return response()->json(true);
@@ -79,6 +70,7 @@ class PaymentStatusSuccessController extends Controller
             Log::error('Erro ao processar webhook do mercado pago');
             Log::info(json_encode($data));
             Log::info($exception->getMessage() . ' in ' . $exception->getFile() . ' line ' . $exception->getLine());
+            Log::info($exception);
             //Se chegou até aqui o problema não é mais do mercado pago é do nosso processamento que precisa ser
             // analisado em outro momento
             return response(true);

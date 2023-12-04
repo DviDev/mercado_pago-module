@@ -3,6 +3,7 @@
 namespace Modules\MercadoPago\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Modules\MercadoPago\Domains\PaymentDomain;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 use Modules\MercadoPago\Models\PaymentModel;
@@ -119,7 +120,8 @@ class OrderStatusService
 
         $order = $this->payment->order;
         if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
-            return false;
+            Log::info("A ordem $order->id já está paga.");
+            return true;
         }
 
         $description = $this->payment->getDescription();
@@ -151,13 +153,14 @@ class OrderStatusService
             return $payment;
         }
         $payment = PaymentModel::makeViaApiData($data);
-        $description = 'OFI[';
-        $items = $order->items;
-        $products = $items->map(fn($i) => $i->product_id)->join(',');
-        $description .= $products.']';
+        $description = 'ORDER[';
+        $items = $order->items()->get('product_id')->pluck('product_id')->join(',');
+//        $products = $items->map(fn($i) => $i->product_id)->join(',');
+        $description .= $items.']';
         $payment->description = $description . '-'.$data['description'];
         $payment->order_id = $order->id;
         $payment->notification_id = $notification_id ?? null;
+        $payment->point_of_interaction_type = $data['point_of_interaction']['type'];
         $payment->save();
 
         return $payment;
