@@ -4,10 +4,15 @@ namespace Modules\MercadoPago\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use MercadoPago\Client\Common\RequestOptions;
+use MercadoPago\Client\Payment\PaymentClient;
+use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Resources\Payment;
 use Modules\Base\Factories\BaseFactory;
 use Modules\Base\Models\BaseModel;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 use Modules\MercadoPago\Entities\Payment\PaymentProps;
+use Modules\Seguros\Models\PropostaModel;
 use Modules\Store\Models\OrderModel;
 
 /**
@@ -56,6 +61,40 @@ class PaymentModel extends BaseModel
         return $payment;
     }
 
+    public static function createViaPaymentMercadoPago(Payment $payment, $order_id): ?PaymentModel
+    {
+        if (PaymentModel::query()->where(['mp_id' => $payment->id])->exists()) {
+            return null;
+        }
+
+        return PaymentModel::createFn(fn(PaymentEntityModel $p) => [
+            $p->mp_id => $payment->id,
+            $p->collector_id => $payment->collector_id,
+            $p->date_approved => $payment->date_approved,
+            $p->date_created => $payment->date_created,
+            $p->description => $payment->description,
+            $p->installments => $payment->installments,
+            $p->operation_type => $payment->operation_type,
+            $p->status => $payment->status,
+            $p->status_detail => $payment->status_detail,
+            $p->transaction_amount => $payment->transaction_amount,
+            $p->transaction_details_installment_amount => $payment->transaction_details->installment_amount,
+            $p->transaction_details_net_received_amount => $payment->transaction_details->net_received_amount,
+            $p->transaction_details_total_paid_amount => $payment->transaction_details->total_paid_amount,
+            $p->transaction_details_external_resource_url => $payment->transaction_details?->external_resource_url,
+            $p->transaction_details_barcode_content => $payment->transaction_details->barcode['content'] ?? null,
+            $p->payment_method_id => $payment->payment_method_id,
+            $p->payment_type_id => $payment->payment_type_id,
+            $p->point_of_interaction_type => $payment->point_of_interaction->type,
+            $p->point_of_interaction_transaction_qr_code => $payment->point_of_interaction->transaction_data->qr_code ?? null,
+            $p->point_of_interaction_transaction_ticket_url => $payment->point_of_interaction->transaction_data->ticket_url ?? null,
+            $p->notification_id => null,
+            $p->order_id => $order_id,
+            $p->external_reference => $payment->external_reference,
+            $p->transaction_details_digitable_line => $payment->transaction_details->digitable_line ?? null,
+        ]);
+    }
+
     protected static function newFactory(): BaseFactory
     {
         return new class extends BaseFactory {
@@ -90,9 +129,10 @@ class PaymentModel extends BaseModel
         };
     }
 
-    public function getGuarded(): array
+    public function getMpPayment(): Payment
     {
-        $p = PaymentEntityModel::props();
-        return collect($p->toArray())->except([$p->id, $p->created_at])->toArray();
+        MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
+        $client = new PaymentClient();
+        return $client->get($this->mp_id);
     }
 }
