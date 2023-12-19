@@ -127,7 +127,7 @@ class OrderStatusService
         $description = $this->payment->getDescription();
         $this->addStatus($order, OrderStatusTypeEnum::paid, $description);
 
-        $this->notify($order, 'Seu pagamento foi aprovado!', $description);
+        $this->notify($order, 'O pagamento da ordem '.$order->id.' no valor de '.$this->payment->transaction_amount.' foi aprovado!', $description);
 
         return true;
     }
