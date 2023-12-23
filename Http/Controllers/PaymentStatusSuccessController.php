@@ -198,8 +198,6 @@ class PaymentStatusSuccessController extends Controller
         } catch (\Exception $exception) {
             DB::rollBack();
             if (config('app.env') == 'local') {
-                ds($exception->getMessage());
-
                 session()->flash('error', 'O pagamento não pode ser aprovado.');
 
                 throw $exception;
@@ -323,7 +321,6 @@ class PaymentStatusSuccessController extends Controller
             } catch (\Exception $exception) {
                 DB::rollBack();
                 if (config('app.env') == 'local') {
-                    ds($exception->getMessage());
                     throw $exception;
                 }
             }
