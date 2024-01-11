@@ -40,7 +40,7 @@ class OrderStatusService
             return true;
         }
 
-        $admin = User::where('type', 'admin')->first();
+        $admin = User::where('type_id', 'admin')->first();
         $admin->notify(new PaymentStatusNotification(
             title: "Status {$this->payment->status} sem tratamento",
             description: "Verificar tratamento para o status {$this->payment->status}"
