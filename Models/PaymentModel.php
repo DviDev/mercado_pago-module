@@ -12,7 +12,7 @@ use Modules\Base\Factories\BaseFactory;
 use Modules\Base\Models\BaseModel;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 use Modules\MercadoPago\Entities\Payment\PaymentProps;
-use Modules\Seguros\Models\PropostaModel;
+use Modules\Seguro\Models\PropostaModel;
 use Modules\Store\Models\OrderModel;
 
 /**
