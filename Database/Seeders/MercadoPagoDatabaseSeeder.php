@@ -2,10 +2,10 @@
 
 namespace Modules\MercadoPago\Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Base\Database\Seeders\BaseSeeder;
 
-class MercadoPagoDatabaseSeeder extends Seeder
+class MercadoPagoDatabaseSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.
