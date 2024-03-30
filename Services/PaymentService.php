@@ -5,6 +5,7 @@ namespace Modules\MercadoPago\Services;
 use App\Models\User;
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Payment\PaymentClient;
+use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Resources\Payment;
 use Modules\MercadoPago\Models\PaymentModel;
@@ -23,13 +24,13 @@ class PaymentService
         $name_array = str($customer->name)->explode(' ');
 
         $address = $customer->person->address();
-        return $client->create([
+        $request = [
             "transaction_amount" => $amount,
             "token" => config('mercadopago.access_token'),
             "description" => $description,
             "installments" => 1,
             "payment_method_id" => 'bolbradesco',
-            "issuer_id" => 2006,
+//            "issuer_id" => 2006,
             "payer" => [
                 "email" => $customer->email,
                 "first_name" => $name_array->shift(),
@@ -47,7 +48,13 @@ class PaymentService
                     "federal_unit" => $address->state
                 )
             ]
-        ], $request_options);
+        ];
+        try {
+            return $client->create($request, $request_options);
+        } catch (MPApiException $exception) {
+            $content = $exception->getApiResponse()->getContent();
+            throw new \Exception((object)$content);
+        }
     }
 
     public static function gerarPix(

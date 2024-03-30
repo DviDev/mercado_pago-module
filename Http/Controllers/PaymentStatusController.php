@@ -2,7 +2,6 @@
 
 namespace Modules\MercadoPago\Http\Controllers;
 
-use App\Models\User;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Controller;
@@ -17,7 +16,6 @@ use Modules\MercadoPago\Models\PaymentModel;
 use Modules\MercadoPago\Models\PreferenceModel;
 use Modules\MercadoPago\Models\UrlNotificationModel;
 use Modules\MercadoPago\Models\WebhookNotificationModel;
-use Modules\MercadoPago\Notifications\PaymentStatusNotification;
 use Modules\MercadoPago\Services\HttpPaymentService;
 use Modules\MercadoPago\Services\OrderStatusService;
 use Modules\Store\Entities\OrderStatusType\OrderStatusTypeEnum;
@@ -27,9 +25,8 @@ use Modules\Store\Models\CartModel;
 use Modules\Store\Models\OrderModel;
 use Modules\Store\Notifications\NotificationInvoice;
 use Modules\Store\Repositories\OrderRepository;
-use SebastianBergmann\LinesOfCode\LinesOfCode;
 
-class PaymentStatusSuccessController extends Controller
+class PaymentStatusController extends Controller
 {
     protected ?PaymentModel $payment;
     protected WebhookNotificationModel|Builder $WebhookNotification;
