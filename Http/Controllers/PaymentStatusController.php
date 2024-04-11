@@ -55,6 +55,10 @@ class PaymentStatusController extends Controller
                 $this->WebhookNotification->data_id,
                 $this->WebhookNotification->id);
 
+            if (config('mercadopago.debug.webhook.payment')) {
+                dd($this->payment);
+            }
+
             if ((new OrderStatusService($this->payment))->checkStatus()) {
                 return response()->json(true);
             }
@@ -88,16 +92,17 @@ class PaymentStatusController extends Controller
                     'mp_id' => $data['id'],
                     'user_id' => $data['user_id'],
                 ], $data);
+
+            if (config('mercadopago.debug.webhook..notification')) {
+                dd($this->WebhookNotification->toArray());
+            }
+
             return true;
         } catch (Exception $exception) {
             Log::error('Houve um erro ao gravar retorno do de webhook do mercado pago');
             Log::info(json_encode($data));
             Log::info($exception->getMessage());
             Log::debug($exception);
-//            User::find(2)->notify(new PaymentStatusNotification(
-//                title: 'Houve um erro ao gravar retorno do de webhook do mercado pago',
-//                description: $exception->getMessage(). ' - '. json_encode($data)
-//            ));
             return false;
         }
     }
