@@ -11,5 +11,11 @@ return [
     'webhook_key' => env('MERCADO_PAGO_WEBHOOK_KEY'),
     'payment_methods' => [
         'pix' => env('MERCADO_PAGO_PAYMENT_METHOD_PIX', false)
+    ],
+    'debug' => [
+        'webhook' => [
+            'payment' => env('MODULE_SEGURO_DEBUG_WEBHOOK_PAYMENT', false),
+            'notification' => env('MODULE_SEGURO_DEBUG_WEBHOOK_NOTIFICATION', false),
+        ]
     ]
 ];
