@@ -56,7 +56,8 @@ class PaymentStatusController extends Controller
                 $this->WebhookNotification->id);
 
             if (config('mercadopago.debug.webhook.payment')) {
-                dd($this->payment);
+                Log::info('MERCADOPAGO.DEBUG.WEBHOOK.PAYMENT:...');
+                Log::info($this->payment->toJson());
             }
 
             if ((new OrderStatusService($this->payment))->checkStatus()) {
@@ -93,8 +94,9 @@ class PaymentStatusController extends Controller
                     'user_id' => $data['user_id'],
                 ], $data);
 
-            if (config('mercadopago.debug.webhook..notification')) {
-                dd($this->WebhookNotification->toArray());
+            if (config('mercadopago.debug.webhook.notification')) {
+                Log::info('MercadoPago Webhook Log: ...');
+                Log::info($this->WebhookNotification->toJson());
             }
 
             return true;
