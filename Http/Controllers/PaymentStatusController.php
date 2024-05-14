@@ -40,6 +40,9 @@ class PaymentStatusController extends Controller
             return response()->json(true);
         }*/
 
+        \Log::info('Status mercado pago:...');
+        \Log::info(json_encode($data));
+
         if (!$this->createWebhookNotification($data)) {
             return response()->json(false, 500);
         }
@@ -49,23 +52,23 @@ class PaymentStatusController extends Controller
         try {
             $api_data = $this->getApiPaymentData($this->WebhookNotification->data_id);
             $order_id = str($api_data['additional_info']['items'][0]['id'])->explode('#')->first();
-            $order = (new OrderRepository())->find($order_id);
-            $this->payment = (new OrderStatusService)->getPayment(
-                $order,
-                $this->WebhookNotification->data_id,
-                $this->WebhookNotification->id);
+            if ($order = (new OrderRepository())->find($order_id)) {
+                $this->payment = (new OrderStatusService)->getPayment(
+                    $order,
+                    $this->WebhookNotification->data_id,
+                    $this->WebhookNotification->id);
 
-            if (config('mercadopago.debug.webhook.payment')) {
-                Log::info('MERCADOPAGO.DEBUG.WEBHOOK.PAYMENT:...');
-                Log::info($this->payment->toJson());
-            }
+                if (config('mercadopago.debug.webhook.payment')) {
+                    Log::info('MERCADOPAGO.DEBUG.WEBHOOK.PAYMENT:...');
+                    Log::info($this->payment->toJson());
+                }
 
-            if ((new OrderStatusService($this->payment))->checkStatus()) {
-                return response()->json(true);
+                if ((new OrderStatusService($this->payment))->checkStatus()) {
+                    return response()->json(true);
+                }
             }
 
             Log::error('O status não está em progresso, nem rejeitado, nem aprovado. Analisar.');
-            Log::info(request()->json());
 
             return response()->json(true);
         } catch (\Exception $exception) {
