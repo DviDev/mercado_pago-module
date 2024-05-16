@@ -52,10 +52,15 @@ class PaymentStatusController extends Controller
         try {
             $api_data = $this->getApiPaymentData($this->WebhookNotification->data_id);
             if (!isset($api_data['additional_info']['items'])) {
-                return response()->json(true);
+                if ($api_data['payment_method_id'] == 'pix') {
+                    $str = str($api_data['description'])->explode('Proposta: ')->pop();
+                    $order_id = str($str)->explode(' ')->shift();
+                }
+//                return response()->json(true);
+            } else {
+                $order_id = str($api_data['additional_info']['items'][0]['id'])->explode('#')->first();
             }
 
-            $order_id = str($api_data['additional_info']['items'][0]['id'])->explode('#')->first();
             if ($order = (new OrderRepository())->find($order_id)) {
                 $this->payment = (new OrderStatusService)->getPayment(
                     $order,
@@ -328,7 +333,6 @@ class PaymentStatusController extends Controller
                 session()->flash('error', $this->payment->getDescription() . '. Tente novamente');
 
                 return redirect()->route('order', $order->id);
-
             } catch (\Exception $exception) {
                 DB::rollBack();
                 if (config('app.env') == 'local') {
