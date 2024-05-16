@@ -88,7 +88,19 @@ class PaymentService
                     "type" => 'CPF',
                     "number" => $customer_cpf
                 ]
-            ]
+            ],
+            "external_reference" => $order_id,
+            /*"additional_info" => [
+                "items" => [
+                    [
+                        "id" => $order_id,
+                        "title" => "Nome do produto ou serviço",
+                        "description" => "Descrição mais detalhada do produto ou serviço",
+                        "quantity" => 1,
+                        "unit_price" => $amount
+                    ]
+                ]
+            ],*/
         ], $request_options);
 
         PaymentModel::createViaPaymentMercadoPago($payment, $order_id);
