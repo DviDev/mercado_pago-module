@@ -21,7 +21,7 @@ class OrderStatusService
     public function checkStatus(): bool
     {
         if ($this->canceled()) {
-            return  true;
+            return true;
         }
 
         if ($this->pixPending()) {
@@ -42,7 +42,7 @@ class OrderStatusService
 
         Log::error("Order Status ----------------------------------------------------------------");
 
-        $superAdmin = User::where('type_id', 2)->first();
+        $superAdmin = User::where('email', config('EMAIL_SUPER_ADMIN'))->first();
         $title = "Status {$this->payment->status} sem tratamento";
         $description = "Verificar tratamento para o status " . $this->payment->status;
 
@@ -55,6 +55,42 @@ class OrderStatusService
         ));
 
         return false;
+    }
+
+    private function canceled(): bool
+    {
+        if ($this->payment->status !== 'cancelled') {
+            return false;
+        }
+
+        $order = $this->payment->order;
+        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::canceled) {
+            return false;
+        }
+
+        $description = $this->payment->getDescription();
+        $this->addStatus($order, OrderStatusTypeEnum::canceled, $description);
+
+        $this->notify($order, 'O pagamento foi cancelado', $description);
+
+        return true;
+    }
+
+    protected function addStatus(OrderModel $order, $status, ?string $description)
+    {
+        return $order->addStatus($status, $description);
+    }
+
+    protected function notify(OrderModel $order, ?string $title, ?string $description = null): void
+    {
+        if (config('app.local_testing_production') == true) {
+            return;
+        }
+        $order->user->notify(new NotificationInvoice(
+            $order,
+            $title,
+            $description,
+        ));
     }
 
     public function pixPending(): bool
@@ -135,7 +171,7 @@ class OrderStatusService
         $description = $this->payment->getDescription();
         $this->addStatus($order, OrderStatusTypeEnum::paid, $description);
 
-        $this->notify($order, 'O pagamento da ordem '.$order->id.' no valor de '.$this->payment->transaction_amount.' foi aprovado!', $description);
+        $this->notify($order, 'O pagamento da ordem ' . $order->id . ' no valor de ' . $this->payment->transaction_amount . ' foi aprovado!', $description);
 
         return true;
     }
@@ -164,49 +200,13 @@ class OrderStatusService
         $description = 'ORDER[';
         $items = $order->items()->get('product_id')->pluck('product_id')->join(',');
 //        $products = $items->map(fn($i) => $i->product_id)->join(',');
-        $description .= $items.']';
-        $payment->description = $description . '-'.$data['description'];
+        $description .= $items . ']';
+        $payment->description = $description . '-' . $data['description'];
         $payment->order_id = $order->id;
         $payment->notification_id = $notification_id ?? null;
         $payment->point_of_interaction_type = $data['point_of_interaction']['type'];
         $payment->save();
 
         return $payment;
-    }
-
-    private function canceled():bool
-    {
-        if ($this->payment->status !== 'cancelled') {
-            return false;
-        }
-
-        $order = $this->payment->order;
-        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::canceled) {
-            return false;
-        }
-
-        $description = $this->payment->getDescription();
-        $this->addStatus($order, OrderStatusTypeEnum::canceled, $description);
-
-        $this->notify($order, 'O pagamento foi cancelado', $description);
-
-        return  true;
-    }
-
-    protected function notify(OrderModel $order, ?string $title, ?string $description = null): void
-    {
-        if (config('app.local_testing_production') == true) {
-            return;
-        }
-        $order->user->notify(new NotificationInvoice(
-            $order,
-            $title,
-            $description,
-        ));
-    }
-
-    protected function addStatus(OrderModel $order, $status, ?string $description)
-    {
-        return $order->addStatus($status, $description);
     }
 }
