@@ -89,18 +89,14 @@ class PaymentService
                     "number" => $customer_cpf
                 ]
             ],
-            "external_reference" => $order_id,
-            /*"additional_info" => [
+            "external_reference" => "order-$order_id",
+            "additional_info" => [
                 "items" => [
                     [
-                        "id" => $order_id,
-                        "title" => "Nome do produto ou serviço",
-                        "description" => "Descrição mais detalhada do produto ou serviço",
-                        "quantity" => 1,
-                        "unit_price" => $amount
+                        "id" => "$order_id#$description"
                     ]
                 ]
-            ],*/
+            ],
         ], $request_options);
 
         PaymentModel::createViaPaymentMercadoPago($payment, $order_id);
