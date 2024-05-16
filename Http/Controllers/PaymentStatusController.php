@@ -51,6 +51,10 @@ class PaymentStatusController extends Controller
         //Todo devemos guardar as informações do mp e analisar posteriormente
         try {
             $api_data = $this->getApiPaymentData($this->WebhookNotification->data_id);
+            if (!isset($api_data['additional_info']['items'])) {
+                return response()->json(true);
+            }
+
             $order_id = str($api_data['additional_info']['items'][0]['id'])->explode('#')->first();
             if ($order = (new OrderRepository())->find($order_id)) {
                 $this->payment = (new OrderStatusService)->getPayment(
