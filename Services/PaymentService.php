@@ -54,7 +54,7 @@ class PaymentService
             return $client->create($request, $request_options);
         } catch (MPApiException $exception) {
             $content = $exception->getApiResponse()->getContent();
-            throw new \Exception((object)$content);
+            throw new \Exception(json_encode($content));
         }
     }
 
