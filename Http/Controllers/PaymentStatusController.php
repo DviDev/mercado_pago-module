@@ -86,7 +86,7 @@ class PaymentStatusController extends Controller
                 }
             }
 
-            Log::error('O status não está em progresso, nem rejeitado, nem aprovado. Analisar.');
+            Log::error('O status ' . $this->payment->status . ' não está em progresso, nem rejeitado, nem aprovado. Analisar.');
 
             return response()->json(true);
         } catch (\Exception $exception) {

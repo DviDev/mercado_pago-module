@@ -23,7 +23,7 @@ class OrderStatusService
             return true;
         }
 
-        if ($this->pixPending()) {
+        if ($this->pending()) {
             return true;
         }
 
@@ -92,7 +92,7 @@ class OrderStatusService
         ));
     }
 
-    public function pixPending(): bool
+    public function pending(): bool
     {
         if ($this->payment->status !== 'pending') {
             return false;
@@ -108,7 +108,7 @@ class OrderStatusService
         $description = $this->payment->getDescription();
         $this->addStatus($order, OrderStatusTypeEnum::in_process, $description);
 
-        $this->notify($order, 'Estamos aguardando a transferência do pix!', $description);
+        $this->notify($order, 'Estamos aguardando o pagamento!', $description);
 
         return true;
     }
