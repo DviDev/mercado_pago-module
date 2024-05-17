@@ -4,10 +4,10 @@ namespace Modules\MercadoPago\Http\Controllers;
 
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Notifications\Notification;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use Modules\MercadoPago\Domains\PaymentDomain;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 use Modules\MercadoPago\Entities\Preference\PreferenceEntityModel as Preference;
@@ -31,6 +31,7 @@ class PaymentStatusController extends Controller
     protected ?PaymentModel $payment;
     protected WebhookNotificationModel|Builder $WebhookNotification;
     private UrlNotificationModel $UrlNotification;
+    protected NotificationInvoice $paymentNotification;
 
     public function payment()
     {
@@ -53,13 +54,7 @@ class PaymentStatusController extends Controller
             $order_id = null;
 
             $api_data = $this->getApiPaymentData($this->WebhookNotification->data_id);
-            if (!isset($api_data['additional_info']['items'])) {
-                if (in_array($api_data['payment_method_id'], ['pix', 'bolbradesco'])) {
-                    $order_id = str($api_data['external_reference'])->explode('order-')->pop();
-                }
-            } else {
-                $order_id = str($api_data['additional_info']['items'][0]['id'])->explode('#')->first();
-            }
+            $order_id = $this->getOrderId($api_data, $order_id);
 
             if (!$order_id) {
                 Log::error('Mercado Pago: Não foi possível encontrar o id do pedido');
@@ -79,7 +74,8 @@ class PaymentStatusController extends Controller
                     Log::info($this->payment->toJson());
                 }
 
-                if ((new OrderStatusService($this->payment))->checkStatus()) {
+                $orderStatusService = new OrderStatusService(payment: $this->payment, notification: $this->paymentNotification);
+                if ($orderStatusService->checkStatus()) {
                     return response()->json(true);
                 }
             } else {
@@ -381,5 +377,17 @@ class PaymentStatusController extends Controller
     {
         $items = $order->items()->get('product_id')->pluck('product_id')->join(',');
         return 'ORDER[' . $items . ']';
+    }
+
+    protected function getOrderId(array $api_data, $order_id)
+    {
+        if (!isset($api_data['additional_info']['items'])) {
+            if (in_array($api_data['payment_method_id'], ['pix', 'bolbradesco'])) {
+                $order_id = str($api_data['external_reference'])->explode('order-')->pop();
+            }
+        } else {
+            $order_id = str($api_data['additional_info']['items'][0]['id'])->explode('#')->first();
+        }
+        return $order_id;
     }
 }

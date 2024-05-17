@@ -13,7 +13,10 @@ use Modules\Store\Notifications\NotificationInvoice;
 
 class OrderStatusService
 {
-    public function __construct(public PaymentModel|null $payment = null)
+    public function __construct(
+        public PaymentModel|null $payment = null,
+        public                   $notification = null
+    )
     {
     }
 
@@ -89,11 +92,11 @@ class OrderStatusService
         if (config('app.local_testing_production') == true) {
             return;
         }
-        $order->user->notify(new NotificationInvoice(
-            $order,
-            $title,
-            $description,
-        ));
+        $notificaton = $this->notification ?? new NotificationInvoice($order);
+        $notificaton->title = $title;
+        $notificaton->description = $description;
+
+        $order->user->notify($notificaton);
     }
 
     public function pending(): bool
