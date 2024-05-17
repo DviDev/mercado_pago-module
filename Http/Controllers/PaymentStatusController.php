@@ -50,15 +50,21 @@ class PaymentStatusController extends Controller
         //Para isso um processo de supervisão da fila (como o supervisor) precisa ser configurado
         //Todo devemos guardar as informações do mp e analisar posteriormente
         try {
+            $order_id = null;
+
             $api_data = $this->getApiPaymentData($this->WebhookNotification->data_id);
             if (!isset($api_data['additional_info']['items'])) {
-                if ($api_data['payment_method_id'] == 'pix') {
+                if (in_array($api_data['payment_method_id'], ['pix', 'bolbradesco'])) {
                     $str = str($api_data['description'])->explode('Proposta: ')->pop();
                     $order_id = str($str)->explode(' ')->shift();
                 }
-//                return response()->json(true);
             } else {
                 $order_id = str($api_data['additional_info']['items'][0]['id'])->explode('#')->first();
+            }
+
+            if (!$order_id) {
+                Log::error('Mercado Pago: Não foi possível encontrar o id do pedido');
+                return response()->json(false, 500);
             }
 
             if ($order = (new OrderRepository())->find($order_id)) {
