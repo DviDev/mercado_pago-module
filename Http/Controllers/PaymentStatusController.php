@@ -67,13 +67,11 @@ class PaymentStatusController extends Controller
             }
 
             if ($order = (new OrderRepository())->find($order_id)) {
-                $items = $order->items()->get('product_id')->pluck('product_id')->join(',');
-                $description = 'ORDER[' . $items . ']';
 
                 $this->payment = (new OrderStatusService)->getPayment(
                     order_id: $order->id,
                     payment_id: $this->WebhookNotification->data_id,
-                    description: $description,
+                    description: $this->getDescription($order),
                     notification_id: $this->WebhookNotification->id);
 
                 if (config('mercadopago.debug.webhook.payment')) {
@@ -377,5 +375,11 @@ class PaymentStatusController extends Controller
         $preference->save();
 
         return true;
+    }
+
+    protected function getDescription(OrderModel $order): string
+    {
+        $items = $order->items()->get('product_id')->pluck('product_id')->join(',');
+        return 'ORDER[' . $items . ']';
     }
 }
