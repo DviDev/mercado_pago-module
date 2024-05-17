@@ -19,6 +19,10 @@ class OrderStatusService
 
     public function checkStatus(): bool
     {
+        if (config('mercadopago.debug.webhook.payment')) {
+            \Log::info('Payment Status: ' . $this->payment->status);
+        }
+
         if ($this->canceled()) {
             return true;
         }
