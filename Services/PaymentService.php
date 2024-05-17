@@ -49,13 +49,6 @@ class PaymentService
                 )
             ],
             "external_reference" => "order-$order_id",
-            "additional_info" => [
-                "items" => [
-                    [
-                        "id" => "$order_id#$description"
-                    ]
-                ]
-            ],
         ];
         try {
             return $client->create($request, $request_options);
@@ -98,13 +91,6 @@ class PaymentService
                 ]
             ],
             "external_reference" => "order-$order_id",
-            "additional_info" => [
-                "items" => [
-                    [
-                        "id" => "$order_id#$description"
-                    ]
-                ]
-            ],
         ], $request_options);
 
         PaymentModel::createViaPaymentMercadoPago($payment, $order_id);

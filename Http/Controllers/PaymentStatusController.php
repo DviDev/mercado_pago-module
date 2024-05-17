@@ -55,8 +55,7 @@ class PaymentStatusController extends Controller
             $api_data = $this->getApiPaymentData($this->WebhookNotification->data_id);
             if (!isset($api_data['additional_info']['items'])) {
                 if (in_array($api_data['payment_method_id'], ['pix', 'bolbradesco'])) {
-                    $str = str($api_data['description'])->explode('Proposta: ')->pop();
-                    $order_id = str($str)->explode(' ')->shift();
+                    $order_id = str($api_data['external_reference'])->explode('order-')->pop();
                 }
             } else {
                 $order_id = str($api_data['additional_info']['items'][0]['id'])->explode('#')->first();
@@ -68,10 +67,14 @@ class PaymentStatusController extends Controller
             }
 
             if ($order = (new OrderRepository())->find($order_id)) {
+                $items = $order->items()->get('product_id')->pluck('product_id')->join(',');
+                $description = 'ORDER[' . $items . ']';
+
                 $this->payment = (new OrderStatusService)->getPayment(
-                    $order,
-                    $this->WebhookNotification->data_id,
-                    $this->WebhookNotification->id);
+                    order_id: $order,
+                    payment_id: $this->WebhookNotification->data_id,
+                    description: $description,
+                    notification_id: $this->WebhookNotification->id);
 
                 if (config('mercadopago.debug.webhook.payment')) {
                     Log::info('MERCADOPAGO.DEBUG.WEBHOOK.PAYMENT:...');

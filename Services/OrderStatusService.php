@@ -4,7 +4,6 @@ namespace Modules\MercadoPago\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Modules\MercadoPago\Domains\PaymentDomain;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 use Modules\MercadoPago\Models\PaymentModel;
 use Modules\MercadoPago\Notifications\PaymentStatusNotification;
@@ -176,11 +175,11 @@ class OrderStatusService
         return true;
     }
 
-    public function getPayment(OrderModel $order, $payment_id, $notification_id = null): ?PaymentModel
+    public function getPayment($order_id, $payment_id, $description, $notification_id = null): ?PaymentModel
     {
         $p = PaymentEntityModel::props();
 
-        $access_token = (new PaymentDomain())->getConfig($order);
+        $access_token = config("mercadopago.access_token");
         $data = (new HttpPaymentService($access_token))->run($payment_id);
         if ($data->failed()) {
             return null;
@@ -192,17 +191,14 @@ class OrderStatusService
             $p->status => $data[$p->status],
             $p->status_detail => $data[$p->status_detail],
             $p->payment_type_id => $data[$p->payment_type_id],
-            $p->order_id => $order->id,
+            $p->order_id => $order_id,
         ])->get()->first()) {
             return $payment;
         }
         $payment = PaymentModel::makeViaApiData($data);
-        $description = 'ORDER[';
-        $items = $order->items()->get('product_id')->pluck('product_id')->join(',');
-//        $products = $items->map(fn($i) => $i->product_id)->join(',');
-        $description .= $items . ']';
+
         $payment->description = $description . '-' . $data['description'];
-        $payment->order_id = $order->id;
+        $payment->order_id = $order_id;
         $payment->notification_id = $notification_id ?? null;
         $payment->point_of_interaction_type = $data['point_of_interaction']['type'];
         $payment->save();
