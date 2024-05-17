@@ -84,9 +84,14 @@ class PaymentStatusController extends Controller
                 if ((new OrderStatusService($this->payment))->checkStatus()) {
                     return response()->json(true);
                 }
+            } else {
+                Log::error('Mercado Pago: O pedido ' . $order_id . ' não foi encontrado');
+                Log::error('Api data: ' . json_encode($api_data));
+                return response()->json(false, 500);
             }
 
             Log::error('O status ' . $this->payment->status . ' não está em progresso, nem rejeitado, nem aprovado. Analisar.');
+            Log::error('Api data: ' . json_encode($api_data));
 
             return response()->json(true);
         } catch (\Exception $exception) {
