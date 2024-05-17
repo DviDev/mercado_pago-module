@@ -41,7 +41,7 @@ class OrderStatusService
 
         Log::error("Order Status ----------------------------------------------------------------");
 
-        $superAdmin = User::where('email', config('EMAIL_SUPER_ADMIN'))->first();
+        $superAdmin = User::where('email', env('EMAIL_SUPER_ADMIN'))->first();
         $title = "Status {$this->payment->status} sem tratamento";
         $description = "Verificar tratamento para o status " . $this->payment->status;
 
