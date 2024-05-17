@@ -3,6 +3,7 @@
 namespace Modules\MercadoPago\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\Exceptions\MPApiException;
@@ -18,7 +19,7 @@ class PaymentService
 
         $client = new PaymentClient();
         $request_options = new RequestOptions();
-        $request_options->setCustomHeaders(["X-Idempotency-Key: " .$idempotency]);
+        $request_options->setCustomHeaders(["X-Idempotency-Key: " . $idempotency]);
 
 //        $customer = $this->proposta->customer;
         $name_array = str($customer->name)->explode(' ');
@@ -64,37 +65,55 @@ class PaymentService
         $idempotency_key,
         $customer_name, $customer_email, $customer_cpf, $description): Payment
     {
-        MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
-
-        $client = new PaymentClient();
-        $request_options = new RequestOptions();
-        $request_options->setCustomHeaders(["X-Idempotency-Key: ".$idempotency_key]);
-
-        $name_array = str($customer_name)->explode(' ');
-        $first_name = $name_array->shift();
-        $last_name = $name_array->join(' ');
-
-        $payment = $client->create([
-            "transaction_amount" => $amount,
-            "token" => config('mercadopago.access_token'),
-            "description" => $description,
-            "installments" => 1,
-            "payment_method_id" => 'pix',
-            "issuer_id" => 2006,
-            "payer" => [
-                "email" => $customer_email,
-                "first_name" => $first_name,
-                "last_name" => $last_name,
-                "identification" => [
-                    "type" => 'CPF',
-                    "number" => $customer_cpf
-                ]
-            ],
-            "external_reference" => "order-$order_id",
-        ], $request_options);
+        $payment = self::generatePix($idempotency_key, $customer_name, $amount, $description, $customer_email, $customer_cpf, $order_id);
 
         PaymentModel::createViaPaymentMercadoPago($payment, $order_id);
 
         return $payment;
+    }
+
+    protected static function generatePix($idempotency_key, $customer_name, $amount, $description, $customer_email, $customer_cpf, $order_id): Payment
+    {
+        try {
+            MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
+
+            $client = new PaymentClient();
+            $request_options = new RequestOptions();
+            $request_options->setCustomHeaders(["X-Idempotency-Key: " . $idempotency_key]);
+
+            $name_array = str($customer_name)->explode(' ');
+            $first_name = $name_array->shift();
+            $last_name = $name_array->join(' ');
+
+            $payment = $client->create([
+                "transaction_amount" => $amount,
+                "token" => config('mercadopago.access_token'),
+                "description" => $description,
+                "installments" => 1,
+                "payment_method_id" => 'pix',
+                "issuer_id" => 2006,
+                "payer" => [
+                    "email" => $customer_email,
+                    "first_name" => $first_name,
+                    "last_name" => $last_name,
+                    "identification" => [
+                        "type" => 'CPF',
+                        "number" => $customer_cpf
+                    ]
+                ],
+                "external_reference" => "order-$order_id",
+            ], $request_options);
+            return $payment;
+        } catch (MPApiException $exception) {
+            Log::info('==================================================');
+            Log::error($exception->getMessage());
+            Log::info('==================================================');
+            Log::error($exception->getApiResponse()->getContent());
+            Log::info('==================================================');
+            Log::error($exception->getTraceAsString());
+            Log::info('==================================================');
+            Log::error($exception->getTraceAsString());
+            throw $exception;
+        }
     }
 }
