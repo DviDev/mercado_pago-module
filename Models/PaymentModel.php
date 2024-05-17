@@ -122,6 +122,7 @@ class PaymentModel extends BaseModel
             'cc_rejected_bad_filled_other' => 'Algum dado do cartão é inválido',
             'cc_rejected_high_risk' => 'O cartão não foi aceito',
             'pending_waiting_transfer' => 'Aguardando transferência',
+            'pending_waiting_payment' => 'Aguardando pagamento',
             'expired' => 'A transação expirou',
             default => $this->status_detail
         };
