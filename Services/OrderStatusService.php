@@ -19,6 +19,10 @@ class OrderStatusService
 
     public function checkStatus(): bool
     {
+        if (config('mercadopago.debug.webhook.payment')) {
+            \Log::info('Payment Status: ' . $this->payment->status);
+        }
+
         if ($this->canceled()) {
             return true;
         }
@@ -41,7 +45,7 @@ class OrderStatusService
 
         Log::error("Order Status ----------------------------------------------------------------");
 
-        $superAdmin = User::where('email', config('EMAIL_SUPER_ADMIN'))->first();
+        $superAdmin = User::where('email', env('EMAIL_SUPER_ADMIN'))->first();
         $title = "Status {$this->payment->status} sem tratamento";
         $description = "Verificar tratamento para o status " . $this->payment->status;
 
@@ -63,7 +67,7 @@ class OrderStatusService
         }
 
         $order = $this->payment->order;
-        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::canceled) {
+        if ($order->isLastStatus(OrderStatusTypeEnum::canceled)) {
             return false;
         }
 
@@ -98,10 +102,10 @@ class OrderStatusService
             return false;
         }
         $order = $this->payment->order;
-        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::in_process) {
+        if ($order->isLastStatus(OrderStatusTypeEnum::in_process)) {
             return false;
         }
-        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
+        if ($order->isLastStatus(OrderStatusTypeEnum::paid)) {
             return false;
         }
 
@@ -120,7 +124,7 @@ class OrderStatusService
         }
 
         $order = $this->payment->order;
-        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::in_process) {
+        if ($order->isLastStatus(OrderStatusTypeEnum::in_process)) {
             return false;
         }
 
@@ -143,7 +147,7 @@ class OrderStatusService
 
         $order = $this->payment->order;
 
-        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::rejected) {
+        if ($order->isLastStatus(OrderStatusTypeEnum::rejected)) {
             return false;
         }
 
