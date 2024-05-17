@@ -12,7 +12,7 @@ use Modules\MercadoPago\Models\PaymentModel;
 
 class PaymentService
 {
-    public static function createBoleto($amount, $idempotency, User $customer, $description): Payment
+    public static function createBoleto($order_id, $amount, $idempotency, User $customer, $description): Payment
     {
         MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
 
@@ -47,7 +47,15 @@ class PaymentService
                     "city" => $address->city,
                     "federal_unit" => $address->state
                 )
-            ]
+            ],
+            "external_reference" => "order-$order_id",
+            "additional_info" => [
+                "items" => [
+                    [
+                        "id" => "$order_id#$description"
+                    ]
+                ]
+            ],
         ];
         try {
             return $client->create($request, $request_options);
