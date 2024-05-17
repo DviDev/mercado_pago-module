@@ -71,7 +71,7 @@ class PaymentStatusController extends Controller
                 $description = 'ORDER[' . $items . ']';
 
                 $this->payment = (new OrderStatusService)->getPayment(
-                    order_id: $order,
+                    order_id: $order->id,
                     payment_id: $this->WebhookNotification->data_id,
                     description: $description,
                     notification_id: $this->WebhookNotification->id);
