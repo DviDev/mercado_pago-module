@@ -4,7 +4,6 @@ namespace Modules\MercadoPago\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Resources\Payment;
@@ -12,7 +11,6 @@ use Modules\Base\Factories\BaseFactory;
 use Modules\Base\Models\BaseModel;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 use Modules\MercadoPago\Entities\Payment\PaymentProps;
-use Modules\Seguro\Models\PropostaModel;
 use Modules\Store\Models\OrderModel;
 
 /**
@@ -36,7 +34,7 @@ class PaymentModel extends BaseModel
     public static function getByMpId(string $id): ?PaymentModel
     {
         $p = PaymentEntityModel::props();
-        return self::where($p->mp_id,$id)->get()->first();
+        return self::where($p->mp_id, $id)->get()->first();
     }
 
     public static function makeViaApiData(mixed $data): PaymentModel
