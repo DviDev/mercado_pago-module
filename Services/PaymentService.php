@@ -24,7 +24,7 @@ class PaymentService
 //        $customer = $this->proposta->customer;
         $name_array = str($customer->name)->explode(' ');
 
-        $address = $customer->person->address();
+        $address = $customer->person->firstAddress();
         $request = [
             "transaction_amount" => $amount,
             "token" => config('mercadopago.access_token'),
