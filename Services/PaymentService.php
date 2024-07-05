@@ -13,7 +13,7 @@ use Modules\MercadoPago\Models\PaymentModel;
 
 class PaymentService
 {
-    public static function createBoleto($order_id, $amount, $idempotency, User $customer, $description): Payment
+    public static function createBoleto($order_id, $amount, $idempotency, User $userCustomer, $description): Payment
     {
         MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
 
@@ -22,23 +22,22 @@ class PaymentService
         $request_options->setCustomHeaders(["X-Idempotency-Key: " . $idempotency]);
 
 //        $customer = $this->proposta->customer;
-        $name_array = str($customer->name)->explode(' ');
+        $name_array = str($userCustomer->name)->explode(' ');
 
-        $address = $customer->person->firstAddress();
+        $address = $userCustomer->person->firstAddress();
         $request = [
             "transaction_amount" => $amount,
             "token" => config('mercadopago.access_token'),
             "description" => $description,
             "installments" => 1,
             "payment_method_id" => 'bolbradesco',
-//            "issuer_id" => 2006,
             "payer" => [
-                "email" => $customer->email,
+                "email" => $userCustomer->email,
                 "first_name" => $name_array->shift(),
                 "last_name" => $name_array->join(' '),
                 "identification" => [
                     "type" => 'CPF',
-                    "number" => $customer->person->human->cpf
+                    "number" => $userCustomer->person->human->cpf
                 ],
                 "address" => array(
                     "zip_code" => $address->zip_code,
