@@ -32,6 +32,7 @@ class PaymentStatusController extends Controller
     protected WebhookNotificationModel|Builder $WebhookNotification;
     private UrlNotificationModel $UrlNotification;
     protected NotificationInvoice $paymentNotification;
+    protected ?OrderModel $orderModel;
 
     public function payment()
     {
@@ -60,13 +61,13 @@ class PaymentStatusController extends Controller
                 Log::error('Mercado Pago: Não foi possível encontrar o id do pedido');
                 return response()->json(false, 500);
             }
+            $this->orderModel = (new OrderRepository())->find($order_id);
 
-            if ($order = (new OrderRepository())->find($order_id)) {
-
+            if ($this->orderModel) {
                 $this->payment = (new OrderStatusService)->getPayment(
-                    order_id: $order->id,
+                    order_id: $this->orderModel->id,
                     payment_id: $this->WebhookNotification->data_id,
-                    description: $this->getDescription($order),
+                    description: $this->getDescription($this->orderModel),
                     notification_id: $this->WebhookNotification->id);
 
                 if (config('mercadopago.debug.webhook.payment')) {
