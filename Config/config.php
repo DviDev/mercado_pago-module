@@ -14,8 +14,13 @@ return [
     ],
     'debug' => [
         'webhook' => [
-            'payment' => env('MODULE_SEGURO_DEBUG_WEBHOOK_PAYMENT', false),
-            'notification' => env('MODULE_SEGURO_DEBUG_WEBHOOK_NOTIFICATION', false),
+            'payment' => env('MODULE_DEBUG_WEBHOOK_PAYMENT', false),
+            'notification' => env('MODULE_DEBUG_WEBHOOK_NOTIFICATION', false),
+        ]
+    ],
+    'order' => [
+        'value' => [
+            'minimum' => env('MERCADO_PAGO_ORDER_VALUE_MINIMUM', 10)
         ]
     ]
 ];
