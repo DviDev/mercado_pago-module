@@ -14,6 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('mp_payments', function (Blueprint $table) {
+            if (DB::getDefaultConnection() == 'sqlite') {
+                return;
+            }
             $table->dropForeign('mp_payments_preference_id_foreign');
             $table->dropColumn('preference_id');
         });
