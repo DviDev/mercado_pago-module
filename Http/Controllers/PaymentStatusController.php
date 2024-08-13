@@ -389,6 +389,73 @@ class PaymentStatusController extends Controller
         } else {
             $order_id = str($api_data['additional_info']['items'][0]['id'])->explode('#')->first();
         }
+        if (is_int($order_id)) {
+            return $order_id;
+        }
+        if (is_string($order_id)) {
+            $order_id = str($order_id)->explode(':')->pop();
+        }
         return $order_id;
+    }
+
+    /**
+     * @see https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
+     */
+    protected function validateMercadoPagoSecretKey(): bool
+    {
+        // Obtain the x-signature value from the header
+        $xSignature = request()->header('x-signature');
+        $xRequestId = request()->header('x-request-id');
+
+        // Obtain Query params related to the request URL
+
+        // Extract the "data.id" from the query params
+        $dataID = request('data.id');
+        if (!$dataID) {
+            return false;
+        }
+        // Obtain the secret key for the user/application from Mercadopago developers site
+        $secret = config('mercadopago.webhook_secret_key');
+
+        if (!$secret) {
+            return false;
+        }
+
+        // Separating the x-signature into parts
+        $parts = explode(',', $xSignature);
+
+        // Initializing variables to store ts and hash
+        $ts = null;
+        $hash = null;
+
+        // Iterate over the values to obtain ts and v1
+        foreach ($parts as $part) {
+            // Split each part into key and value
+            $keyValue = explode('=', $part, 2);
+            if (count($keyValue) == 2) {
+                $key = trim($keyValue[0]);
+                $value = trim($keyValue[1]);
+                if ($key === "ts") {
+                    $ts = $value;
+                } elseif ($key === "v1") {
+                    $hash = $value;
+                }
+            }
+        }
+
+        if (!$ts || !$hash) {
+            return false;
+        }
+
+        // Generate the manifest string
+        $manifest = "id:$dataID;request-id:$xRequestId;ts:$ts;";
+
+        // Create an HMAC signature defining the hash type and the key as a byte array
+        $sha = hash_hmac('sha256', $manifest, $secret);
+
+        if ($sha !== $hash) {
+            return false; // HMAC verification failed
+        }
+        return true;
     }
 }

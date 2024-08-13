@@ -59,7 +59,7 @@ class PaymentModel extends BaseModel
         return $payment;
     }
 
-    public static function createViaPaymentMercadoPago(Payment $payment, $order_id): ?PaymentModel
+    public static function criaViaPaymentMercadoPago(Payment $payment, $order_id): ?PaymentModel
     {
         if (PaymentModel::query()->where(['mp_id' => $payment->id])->exists()) {
             return null;
