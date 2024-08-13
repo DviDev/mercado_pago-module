@@ -9,6 +9,7 @@ return [
         ? env('MERCADO_PAGO_ACCESS_TOKEN')
         : env('MERCADO_PAGO_ACCESS_TOKEN_PROD'),
     'webhook_key' => env('MERCADO_PAGO_WEBHOOK_KEY'),
+    'webhook_secret_key' => env('MERCADO_PAGO_WEBHOOK_SECRET_KEY'),
     'payment_methods' => [
         'pix' => env('app_env') == 'local' ? false : env('MERCADO_PAGO_PAYMENT_METHOD_PIX', false)
     ],
