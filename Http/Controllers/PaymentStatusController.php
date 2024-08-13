@@ -270,9 +270,8 @@ class PaymentStatusController extends Controller
             return redirect()->route('order', $this->payment->order->id);
         } catch (\Exception $exception) {
             DB::rollBack();
-            if (config('app.env') == 'local') {
-                throw $exception;
-            }
+            throw_if(config('app.env') == 'local', $exception);
+
             session()->flash('error', 'Houve um problema no processamento do pedido. Aguarde.');
             Log::error('Order pending: status:' . OrderStatusTypeEnum::in_process->name . $exception->getMessage());
             return redirect()->route('orders');
@@ -344,9 +343,8 @@ class PaymentStatusController extends Controller
                 return redirect()->route('order', $order->id);
             } catch (\Exception $exception) {
                 DB::rollBack();
-                if (config('app.env') == 'local') {
-                    throw $exception;
-                }
+
+                throw_if(config('app.env') == 'local', $exception);
             }
         }
     }
