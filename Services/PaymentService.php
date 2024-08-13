@@ -66,7 +66,7 @@ class PaymentService
     {
         $payment = self::generatePix($idempotency_key, $customer_name, $amount, $description, $customer_email, $customer_cpf, $order_id);
 
-        PaymentModel::createViaPaymentMercadoPago($payment, $order_id);
+        PaymentModel::criaViaPaymentMercadoPago($payment, $order_id);
 
         return $payment;
     }
