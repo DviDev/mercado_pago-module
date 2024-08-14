@@ -25,6 +25,8 @@ class PaymentService
         $name_array = str($userCustomer->name)->explode(' ');
 
         $address = $userCustomer->person->firstAddress();
+        $type = $userCustomer->person->human ? 'CPF' : 'CNPJ';
+        $number = $userCustomer->person->human?->cpf ?: $userCustomer->person->firm->cnpj;
         $request = [
             "transaction_amount" => $amount,
             "token" => config('mercadopago.access_token'),
@@ -36,8 +38,8 @@ class PaymentService
                 "first_name" => $name_array->shift(),
                 "last_name" => $name_array->join(' '),
                 "identification" => [
-                    "type" => 'CPF',
-                    "number" => $userCustomer->person->human->cpf
+                    "type" => $type,
+                    "number" => $number
                 ],
                 "address" => array(
                     "zip_code" => $address->zip_code,
@@ -62,16 +64,25 @@ class PaymentService
         $order_id,
         $amount,
         $idempotency_key,
-        $customer_name, $customer_email, $customer_cpf, $description): Payment
+        $customer_name, $customer_email, $document_type, $document, $description): Payment
     {
-        $payment = self::generatePix($idempotency_key, $customer_name, $amount, $description, $customer_email, $customer_cpf, $order_id);
+        $payment = self::generatePix($idempotency_key, $customer_name, $amount, $description, $customer_email, $document_type, $document, $order_id);
 
         PaymentModel::criaViaPaymentMercadoPago($payment, $order_id);
 
         return $payment;
     }
 
-    protected static function generatePix($idempotency_key, $customer_name, $amount, $description, $customer_email, $customer_cpf, $order_id): Payment
+    protected static function generatePix(
+        $idempotency_key,
+        $customer_name,
+        $amount,
+        $description,
+        $customer_email,
+        $document_type,
+        $document,
+        $order_id
+    ): Payment
     {
         try {
             MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
@@ -96,8 +107,8 @@ class PaymentService
                     "first_name" => $first_name,
                     "last_name" => $last_name,
                     "identification" => [
-                        "type" => 'CPF',
-                        "number" => $customer_cpf
+                        "type" => $document_type,
+                        "number" => $document
                     ]
                 ],
                 "external_reference" => "order-$order_id",
