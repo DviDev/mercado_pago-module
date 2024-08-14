@@ -13,7 +13,12 @@ use Modules\MercadoPago\Models\PaymentModel;
 
 class PaymentService
 {
-    public static function createBoleto($order_id, $amount, $idempotency, User $userCustomer, $description): Payment
+    public static function createBoleto(
+        $order_id,
+        $amount,
+        $idempotency,
+        User $userCustomer,
+        $description): Payment
     {
         MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
 
