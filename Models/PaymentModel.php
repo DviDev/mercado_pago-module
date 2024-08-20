@@ -4,6 +4,7 @@ namespace Modules\MercadoPago\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Resources\Payment;
@@ -17,6 +18,7 @@ use Modules\Store\Models\OrderModel;
  * @author Davi Menezes (davimenezes.dev@gmail.com)
  * @link https://github.com/DaviMenezes
  * @property-read OrderModel $order
+ * @property-read PaymentCardModel $card
  * @method PaymentEntityModel toEntity()
  */
 class PaymentModel extends BaseModel
@@ -133,5 +135,10 @@ class PaymentModel extends BaseModel
         MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
         $client = new PaymentClient();
         return $client->get($this->mp_id);
+    }
+
+    public function card(): HasOne
+    {
+        return $this->hasOne(PaymentCardModel::class, 'payment_id');
     }
 }
