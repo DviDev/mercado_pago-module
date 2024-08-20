@@ -210,6 +210,18 @@ class OrderStatusService
         $payment->point_of_interaction_type = $data['point_of_interaction']['type'];
         $payment->save();
 
+        $payment->card()->create([
+            'cardholder_identification_number' => $data['card']['cardholder']['identification']['number'],
+            'cardholder_identification_type' => $data['card']['cardholder']['identification']['type'],
+            'cardholder_name' => $data['card']['cardholder']['name'],
+            'expiration_month' => $data['card']['expiration_month'],
+            'expiration_year' => $data['card']['expiration_year'],
+            'first_six_digits' => $data['card']['first_six_digits'],
+            'last_four_digits' => $data['card']['last_four_digits'],
+            'created_at' => $data['date_created'],
+            'updated_at' => $data['date_last_updated'],
+        ]);
+
         return $payment;
     }
 }
