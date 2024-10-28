@@ -67,7 +67,8 @@ class PaymentModel extends BaseModel
             return null;
         }
 
-        return PaymentModel::createFn(fn(PaymentEntityModel $p) => [
+        $p = PaymentEntityModel::props();
+        $data = [
             $p->mp_id => $payment->id,
             $p->collector_id => $payment->collector_id,
             $p->date_approved => $payment->date_approved,
@@ -82,7 +83,6 @@ class PaymentModel extends BaseModel
             $p->transaction_details_net_received_amount => $payment->transaction_details->net_received_amount,
             $p->transaction_details_total_paid_amount => $payment->transaction_details->total_paid_amount,
             $p->transaction_details_external_resource_url => $payment->transaction_details?->external_resource_url,
-            $p->transaction_details_barcode_content => $payment->transaction_details->barcode['content'] ?? null,
             $p->payment_method_id => $payment->payment_method_id,
             $p->payment_type_id => $payment->payment_type_id,
             $p->point_of_interaction_type => $payment->point_of_interaction->type,
@@ -92,7 +92,13 @@ class PaymentModel extends BaseModel
             $p->order_id => $order_id,
             $p->external_reference => $payment->external_reference,
             $p->transaction_details_digitable_line => $payment->transaction_details->digitable_line ?? null,
-        ]);
+        ];
+        if ($payment->payment_type_id == 'ticket') {
+            /**@var Payment\Barcode $barcode */
+            $barcode = $payment->transaction_details->barcode;
+            $data[$p->transaction_details_barcode_content] = $barcode->content;
+        }
+        return PaymentModel::create($data);
     }
 
     protected static function newFactory(): BaseFactory
