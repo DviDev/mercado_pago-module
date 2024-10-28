@@ -94,12 +94,13 @@ class PaymentModel extends BaseModel
             $p->transaction_details_digitable_line => $payment->transaction_details->digitable_line ?? null,
         ];
         if ($payment->payment_type_id == 'ticket') {
-            $barcode = $payment->transaction_details->barcode;
-            if (is_object($barcode)) {
-                /**@var Payment\Barcode $barcode */
-                $data[$p->transaction_details_barcode_content] = $barcode->content;
-            } else {
-                $data[$p->transaction_details_barcode_url] = $barcode['content'];
+            if($barcode = $payment->transaction_details->barcode) {
+                if (is_object($barcode)) {
+                    /**@var Payment\Barcode $barcode */
+                    $data[$p->transaction_details_barcode_content] = $barcode->content;
+                } else {
+                    $data[$p->transaction_details_barcode_url] = $barcode['content'];
+                }
             }
         }
         return PaymentModel::create($data);
