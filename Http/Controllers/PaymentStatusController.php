@@ -254,7 +254,7 @@ class PaymentStatusController extends Controller
 
             if ($order->payment->id) {
                 DB::commit();
-                return redirect()->route('orders');
+                return redirect()->route('store.store_orders.list');
             }
             if (!$this->payment = PaymentModel::getByMpId($data['payment_id'])) {
                 $this->createPayment($order, $data['payment_id']);
@@ -274,7 +274,7 @@ class PaymentStatusController extends Controller
 
             session()->flash('error', 'Houve um problema no processamento do pedido. Aguarde.');
             Log::error('Order pending: status:' . OrderStatusTypeEnum::in_process->name . $exception->getMessage());
-            return redirect()->route('orders');
+            return redirect()->route('store.store_orders.list');
         }
     }
 
