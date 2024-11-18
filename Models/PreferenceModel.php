@@ -102,6 +102,13 @@ class PreferenceModel extends BaseModel
                 $client_array['payment_methods']['excluded_payment_methods'] = $mp_excluded_payment_methods->toArray();
             }
 
+            //Todo back_urls testing... wip
+            /*$client_array['back_urls'] = [
+                "success" => route('order.status.success', $order->id),
+                "failure" => route('order.status.failure', $order->id),
+                "pending" => route('order.status.pending', $order->id)
+            ];*/
+
             $mp_preference = $client->create($client_array);
 
             $preference->mp_preference_id = $mp_preference->id;
