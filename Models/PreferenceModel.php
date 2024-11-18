@@ -65,11 +65,16 @@ class PreferenceModel extends BaseModel
      */
     static public function createMpPreference(
         OrderModel $order,
-        array      $items = [],
+        array $items,
         array      $excluded_payment_methods = [],
         array      $excluded_payment_types = []
     ): PreferenceModel
     {
+        foreach ($items as $item) {
+            if (!$item instanceof PreferenceItemDTO) {
+                throw new \InvalidArgumentException(__('mercadopago::preference.All items must be instances of ', ['class' => PreferenceItemDTO::class]));
+            }
+        }
         try {
             \DB::beginTransaction();
 
