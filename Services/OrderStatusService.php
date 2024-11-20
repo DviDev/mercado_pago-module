@@ -89,7 +89,7 @@ class OrderStatusService
 
     protected function notify(OrderModel $order, ?string $title, ?string $description = null): void
     {
-        if (config('app.local_testing_production') == true) {
+        if (config('base.local_testing_production') == true) {
             return;
         }
         $notificaton = $this->notification ?? new NotificationInvoice($order);
