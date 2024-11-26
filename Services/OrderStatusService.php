@@ -65,7 +65,7 @@ class OrderStatusService
 
     private function canceled(): bool
     {
-        if ($this->payment->status !== 'cancelled') {
+        if ($this->payment->status !== OrderStatusTypeEnum::canceled->name) {
             return false;
         }
 
@@ -122,7 +122,7 @@ class OrderStatusService
 
     protected function inProcess(): bool
     {
-        if ($this->payment->status != 'in_process') {
+        if ($this->payment->status != OrderStatusTypeEnum::in_process->name) {
             return false;
         }
 
@@ -144,7 +144,7 @@ class OrderStatusService
 
     protected function reject(): bool
     {
-        if ($this->payment->status !== 'rejected') {
+        if ($this->payment->status !== OrderStatusTypeEnum::rejected->name) {
             return false;
         }
 
