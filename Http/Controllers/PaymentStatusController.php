@@ -36,11 +36,16 @@ class PaymentStatusController extends Controller
 
     public function payment()
     {
+        if (!$this->validateMercadoPagoSecretKey()) {
+            return response('👎🏻', 404);
+        }
+
         $data = \request()->all();
+
         //when check url in webhook portal of mp
-        /*if ($data['type'] == 'test') {
+        if ($data['type'] == 'test') {
             return response()->json(true);
-        }*/
+        }
 
         \Log::info('Status mercado pago:...');
         \Log::info(json_encode($data));
