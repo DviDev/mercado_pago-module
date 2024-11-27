@@ -82,6 +82,9 @@ class PaymentStatusController extends Controller
 
                 $orderStatusService = new OrderStatusService(payment: $this->payment, notification: $this->paymentNotification);
                 if ($orderStatusService->checkStatus()) {
+                    if ($this->payment->status == 'approved') {
+                        CartModel::clearOrderItems($this->orderModel);
+                    }
                     return response()->json(true);
                 }
             } else {
