@@ -65,11 +65,20 @@ class PreferenceModel extends BaseModel
      */
     static public function createMpPreference(
         OrderModel $order,
-        array      $items = [],
+        array $items,
         array      $excluded_payment_methods = [],
         array      $excluded_payment_types = []
-    ): PreferenceModel
+    ): ?PreferenceModel
     {
+        if (!config('mercadopago.enable')) {
+            return null;
+        }
+
+        foreach ($items as $item) {
+            if (!$item instanceof PreferenceItemDTO) {
+                throw new \InvalidArgumentException(__('mercadopago::preference.All items must be instances of ', ['class' => PreferenceItemDTO::class]));
+            }
+        }
         try {
             \DB::beginTransaction();
 
@@ -96,6 +105,13 @@ class PreferenceModel extends BaseModel
             if ($mp_excluded_payment_methods->count() > 0) {
                 $client_array['payment_methods']['excluded_payment_methods'] = $mp_excluded_payment_methods->toArray();
             }
+
+            //Todo back_urls testing... wip
+            /*$client_array['back_urls'] = [
+                "success" => route('order.status.success', $order->id),
+                "failure" => route('order.status.failure', $order->id),
+                "pending" => route('order.status.pending', $order->id)
+            ];*/
 
             $mp_preference = $client->create($client_array);
 

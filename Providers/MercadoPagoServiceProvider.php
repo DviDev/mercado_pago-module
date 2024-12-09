@@ -2,8 +2,10 @@
 
 namespace Modules\MercadoPago\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Support\ServiceProvider;
+use Modules\MercadoPago\Listeners\CreatePreferenceListener;
+use Modules\Store\App\Events\OrderWithItemsCreatedEvent;
 
 class MercadoPagoServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,8 @@ class MercadoPagoServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        \Event::listen(OrderWithItemsCreatedEvent::class, CreatePreferenceListener::class);
+
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
