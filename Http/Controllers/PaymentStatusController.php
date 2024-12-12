@@ -36,19 +36,23 @@ class PaymentStatusController extends Controller
 
     public function payment()
     {
+        \Log::info('Status mercado pago:...');
+        $data = \request()->all();
+        $data['xSignature'] = request()->header('x-signature');
+        $data['xRequestId'] = request()->header('x-request-id');
+        \Log::info(json_encode($data));
+        
         if (!$this->validateMercadoPagoSecretKey()) {
+            \Log::info('A chave secreta do MP não é valida');
             return response('👎🏻', 404);
         }
 
-        $data = \request()->all();
 
         //when check url in webhook portal of mp
         if ($data['type'] == 'test') {
             return response()->json(true);
         }
 
-        \Log::info('Status mercado pago:...');
-        \Log::info(json_encode($data));
 
         if (!$this->createWebhookNotification($data)) {
             return response()->json(false, 500);
