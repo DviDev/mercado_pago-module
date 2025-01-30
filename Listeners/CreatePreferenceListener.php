@@ -26,7 +26,7 @@ class CreatePreferenceListener
             $items[] = new PreferenceItemDTO(
                 id: $event->order->id . '#' . $item->id,
                 title: $item->description,
-                unit_price: $item->price
+                unit_price: $item->price * $item->quantity
             );
         }
         PreferenceModel::createMpPreference($event->order, $items);
