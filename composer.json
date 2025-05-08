@@ -1,6 +1,7 @@
 {
-    "name": "dvidev/mercadopago",
-    "description": "Modulo laravel para gerenciar pagamentos via MercadoPago",
+    "name": "dvidev/mercado_pago-module",
+    "description": "Modulo Laravel MercadoPago",
+    "type": "laravel-module",
     "authors": [
         {
             "name": "Davi Menezes",
