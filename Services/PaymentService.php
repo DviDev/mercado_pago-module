@@ -22,40 +22,40 @@ class PaymentService
     {
         MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
 
-        $client = new PaymentClient();
-        $request_options = new RequestOptions();
-        $request_options->setCustomHeaders(["X-Idempotency-Key: " . $idempotency]);
+        $client = new PaymentClient;
+        $request_options = new RequestOptions;
+        $request_options->setCustomHeaders(['X-Idempotency-Key: '.$idempotency]);
 
-//        $customer = $this->proposta->customer;
+        //        $customer = $this->proposta->customer;
         $name_array = str($userCustomer->name)->explode(' ');
 
         $address = $userCustomer->person->firstAddress();
         $type = $userCustomer->person->human ? 'CPF' : 'CNPJ';
         $number = $userCustomer->person->human?->cpf ?: $userCustomer->person->firm->cnpj;
         $request = [
-            "transaction_amount" => $amount,
-            "token" => config('mercadopago.access_token'),
-            "description" => $description,
-            "installments" => 1,
-            "payment_method_id" => 'bolbradesco',
-            "payer" => [
-                "email" => $userCustomer->email,
-                "first_name" => $name_array->shift(),
-                "last_name" => $name_array->join(' '),
-                "identification" => [
-                    "type" => $type,
-                    "number" => $number
+            'transaction_amount' => $amount,
+            'token' => config('mercadopago.access_token'),
+            'description' => $description,
+            'installments' => 1,
+            'payment_method_id' => 'bolbradesco',
+            'payer' => [
+                'email' => $userCustomer->email,
+                'first_name' => $name_array->shift(),
+                'last_name' => $name_array->join(' '),
+                'identification' => [
+                    'type' => $type,
+                    'number' => $number,
                 ],
-                "address" => array(
-                    "zip_code" => $address->zip_code,
-                    "street_name" => $address->street_name,
-                    "street_number" => $address->number,
-                    "neighborhood" => $address->neighborhood,
-                    "city" => $address->city,
-                    "federal_unit" => $address->state
-                )
+                'address' => [
+                    'zip_code' => $address->zip_code,
+                    'street_name' => $address->street_name,
+                    'street_number' => $address->number,
+                    'neighborhood' => $address->neighborhood,
+                    'city' => $address->city,
+                    'federal_unit' => $address->state,
+                ],
             ],
-            "external_reference" => "order-$order_id",
+            'external_reference' => "order-$order_id",
         ];
         try {
             return $client->create($request, $request_options);
@@ -87,37 +87,37 @@ class PaymentService
         $document_type,
         $document,
         $order_id
-    ): Payment
-    {
+    ): Payment {
         try {
             MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
 
-            $client = new PaymentClient();
-            $request_options = new RequestOptions();
-            $request_options->setCustomHeaders(["X-Idempotency-Key: " . $idempotency_key]);
+            $client = new PaymentClient;
+            $request_options = new RequestOptions;
+            $request_options->setCustomHeaders(['X-Idempotency-Key: '.$idempotency_key]);
 
             $name_array = str($customer_name)->explode(' ');
             $first_name = $name_array->shift();
             $last_name = $name_array->join(' ');
 
             $payment = $client->create([
-                "transaction_amount" => $amount,
-                "token" => config('mercadopago.access_token'),
-                "description" => $description,
-                "installments" => 1,
-                "payment_method_id" => 'pix',
-                "issuer_id" => 2006,
-                "payer" => [
-                    "email" => $customer_email,
-                    "first_name" => $first_name,
-                    "last_name" => $last_name,
-                    "identification" => [
-                        "type" => $document_type,
-                        "number" => $document
-                    ]
+                'transaction_amount' => $amount,
+                'token' => config('mercadopago.access_token'),
+                'description' => $description,
+                'installments' => 1,
+                'payment_method_id' => 'pix',
+                'issuer_id' => 2006,
+                'payer' => [
+                    'email' => $customer_email,
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
+                    'identification' => [
+                        'type' => $document_type,
+                        'number' => $document,
+                    ],
                 ],
-                "external_reference" => "order-$order_id",
+                'external_reference' => "order-$order_id",
             ], $request_options);
+
             return $payment;
         } catch (MPApiException $exception) {
             Log::info('==================================================');

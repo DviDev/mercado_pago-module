@@ -29,9 +29,13 @@ use Modules\Store\Repositories\OrderRepository;
 class PaymentStatusController extends Controller
 {
     protected ?PaymentModel $payment;
+
     protected WebhookNotificationModel|Builder $WebhookNotification;
+
     private UrlNotificationModel $UrlNotification;
+
     protected NotificationInvoice $paymentNotification;
+
     protected ?OrderModel $orderModel;
 
     public function payment()
@@ -41,36 +45,36 @@ class PaymentStatusController extends Controller
         $data['xSignature'] = request()->header('x-signature');
         $data['xRequestId'] = request()->header('x-request-id');
         \Log::info(json_encode($data));
-        
-        if (!$this->validateMercadoPagoSecretKey()) {
+
+        if (! $this->validateMercadoPagoSecretKey()) {
             \Log::info('A chave secreta do MP não é valida');
+
             return response('👎🏻', 404);
         }
 
-
-        //when check url in webhook portal of mp
+        // when check url in webhook portal of mp
         if ($data['type'] == 'test') {
             return response()->json(true);
         }
 
-
-        if (!$this->createWebhookNotification($data)) {
+        if (! $this->createWebhookNotification($data)) {
             return response()->json(false, 500);
         }
-        //Todo todo o processamento abaixo pode rodar em segundo plano para liberar a requisicao se necessario.
-        //Para isso um processo de supervisão da fila (como o supervisor) precisa ser configurado
-        //Todo devemos guardar as informações do mp e analisar posteriormente
+        // Todo todo o processamento abaixo pode rodar em segundo plano para liberar a requisicao se necessario.
+        // Para isso um processo de supervisão da fila (como o supervisor) precisa ser configurado
+        // Todo devemos guardar as informações do mp e analisar posteriormente
         try {
             $order_id = null;
 
             $api_data = $this->getApiPaymentData($this->WebhookNotification->data_id);
             $order_id = $this->getOrderId($api_data, $order_id);
 
-            if (!$order_id) {
+            if (! $order_id) {
                 Log::error('Mercado Pago: Não foi possível encontrar o id do pedido');
+
                 return response()->json(false, 500);
             }
-            $this->orderModel = (new OrderRepository())->find($order_id);
+            $this->orderModel = (new OrderRepository)->find($order_id);
 
             if ($this->orderModel) {
                 $this->payment = (new OrderStatusService)->getPayment(
@@ -89,24 +93,27 @@ class PaymentStatusController extends Controller
                     if ($this->payment->status == 'approved') {
                         CartModel::clearOrderItems($this->orderModel);
                     }
+
                     return response()->json(true);
                 }
             } else {
-                Log::error('Mercado Pago: O pedido ' . $order_id . ' não foi encontrado');
-                Log::error('Api data: ' . json_encode($api_data));
+                Log::error('Mercado Pago: O pedido '.$order_id.' não foi encontrado');
+                Log::error('Api data: '.json_encode($api_data));
+
                 return response()->json(false, 500);
             }
 
-            Log::error('O status ' . $this->payment->status . ' não está em progresso, nem rejeitado, nem aprovado. Analisar.');
-            Log::error('Api data: ' . json_encode($api_data));
+            Log::error('O status '.$this->payment->status.' não está em progresso, nem rejeitado, nem aprovado. Analisar.');
+            Log::error('Api data: '.json_encode($api_data));
 
             return response()->json(true);
         } catch (\Exception $exception) {
             Log::error('Erro ao processar webhook do mercado pago');
             Log::info(json_encode($data));
-            Log::info($exception->getMessage() . ' in ' . $exception->getFile() . ' line ' . $exception->getLine());
+            Log::info($exception->getMessage().' in '.$exception->getFile().' line '.$exception->getLine());
             Log::info($exception);
-            //Se chegou até aqui o problema não é mais do mercado pago é do nosso processamento que precisa ser
+
+            // Se chegou até aqui o problema não é mais do mercado pago é do nosso processamento que precisa ser
             // analisado em outro momento
             return response(true);
         }
@@ -117,7 +124,7 @@ class PaymentStatusController extends Controller
         try {
             $data['data_id'] = $data['data']['id'];
             $data['mp_id'] = $data['id'];
-            $data['live_mode'] = (boolean)$data['live_mode'];
+            $data['live_mode'] = (bool) $data['live_mode'];
 
             $this->WebhookNotification = WebhookNotificationModel::query()
                 ->updateOrCreate([
@@ -138,20 +145,21 @@ class PaymentStatusController extends Controller
             Log::info(json_encode($data));
             Log::info($exception->getMessage());
             Log::debug($exception);
+
             return false;
         }
     }
 
     protected function getApiPaymentData($payment_id): array
     {
-        $access_token = config("mercadopago.access_token");
+        $access_token = config('mercadopago.access_token');
         $data = (new HttpPaymentService($access_token))->run($payment_id);
-        if (!$data->failed()) {
+        if (! $data->failed()) {
             return $data->json();
         }
         $msg = "MercadoPago: Registro {$this->WebhookNotification->data_id} não encontrado.";
         if (config('app.env') == 'local') {
-            $msg .= ' token:' . config("mercadopago.access_token");
+            $msg .= ' token:'.config('mercadopago.access_token');
         }
         throw new Exception($msg);
     }
@@ -163,7 +171,7 @@ class PaymentStatusController extends Controller
     {
         $p = PaymentEntityModel::props();
 
-        $access_token = (new PaymentDomain())->getConfig($order);
+        $access_token = (new PaymentDomain)->getConfig($order);
         $data = (new HttpPaymentService($access_token))->run($payment_id)->json();
 
         $arr = [
@@ -194,14 +202,15 @@ class PaymentStatusController extends Controller
 
     public function success(OrderModel $order)
     {
-        $data = collect(request()->all())->map(fn($value) => $value == 'null' ? null : $value)->all();
+        $data = collect(request()->all())->map(fn ($value) => $value == 'null' ? null : $value)->all();
         $data['preference_id'] = PreferenceModel::getByStringId($data['preference_id'])->id;
         $this->UrlNotification = UrlNotificationModel::query()->create($data);
 
         try {
-            if (!$this->createPayment($order, $data['payment_id'])) {
+            if (! $this->createPayment($order, $data['payment_id'])) {
                 session()->flash('error', 'Não foi possível se comunicar com o sistema de pagamentos. Aguarde.');
                 session()->flash('only_toastr');
+
                 return redirect()->route('order', $order->id);
             }
 
@@ -239,13 +248,11 @@ class PaymentStatusController extends Controller
 
                 throw $exception;
             }
+
             return redirect()->route('order', $order->id);
         }
     }
 
-    /**
-     * @return void
-     */
     protected function clearCartItems(): void
     {
         CartModel::getByLoggedUser()->items()->each(function (CartItemModel $cartItem) {
@@ -266,9 +273,10 @@ class PaymentStatusController extends Controller
 
             if ($order->payment->id) {
                 DB::commit();
+
                 return redirect()->route('store.store_orders.list');
             }
-            if (!$this->payment = PaymentModel::getByMpId($data['payment_id'])) {
+            if (! $this->payment = PaymentModel::getByMpId($data['payment_id'])) {
                 $this->createPayment($order, $data['payment_id']);
             }
             $this->payment->save();
@@ -285,22 +293,23 @@ class PaymentStatusController extends Controller
             throw_if(config('app.env') == 'local', $exception);
 
             session()->flash('error', 'Houve um problema no processamento do pedido. Aguarde.');
-            Log::error('Order pending: status:' . OrderStatusTypeEnum::in_process->name . $exception->getMessage());
+            Log::error('Order pending: status:'.OrderStatusTypeEnum::in_process->name.$exception->getMessage());
+
             return redirect()->route('store.store_orders.list');
         }
     }
 
     protected function getPreference($preference_id): PreferenceModel
     {
-        return PreferenceModel::whereFn(fn(Preference $p) => [
-            [$p->mp_preference_id, $preference_id]
+        return PreferenceModel::whereFn(fn (Preference $p) => [
+            [$p->mp_preference_id, $preference_id],
         ])->get()->first();
     }
 
     protected function createUrlNotification($data): void
     {
-        $query = UrlNotificationModel::whereFn(fn(UrlNotificationEntityModel $p) => [
-            [$p->payment_id, $data['payment_id']]
+        $query = UrlNotificationModel::whereFn(fn (UrlNotificationEntityModel $p) => [
+            [$p->payment_id, $data['payment_id']],
         ]);
         $this->UrlNotification = $query->exists()
             ? $query->get()->first()
@@ -330,7 +339,7 @@ class PaymentStatusController extends Controller
 
     public function failure(OrderModel $order)
     {
-        $data = collect(request()->all())->map(fn($value) => $value == 'null' ? null : $value)->all();
+        $data = collect(request()->all())->map(fn ($value) => $value == 'null' ? null : $value)->all();
         $preference = $this->getPreference($data['preference_id']);
         $data['preference_id'] = $preference->id;
 
@@ -350,7 +359,7 @@ class PaymentStatusController extends Controller
 
                 DB::commit();
 
-                session()->flash('error', $this->payment->getDescription() . '. Tente novamente');
+                session()->flash('error', $this->payment->getDescription().'. Tente novamente');
 
                 return redirect()->route('order', $order->id);
             } catch (\Exception $exception) {
@@ -387,12 +396,13 @@ class PaymentStatusController extends Controller
     protected function getDescription(OrderModel $order): string
     {
         $items = $order->items()->get('product_id')->pluck('product_id')->join(',');
-        return 'ORDER[' . $items . ']';
+
+        return 'ORDER['.$items.']';
     }
 
     protected function getOrderId(array $api_data, $order_id)
     {
-        if (!isset($api_data['additional_info']['items'])) {
+        if (! isset($api_data['additional_info']['items'])) {
             if (in_array($api_data['payment_method_id'], ['pix', 'bolbradesco'])) {
                 $order_id = str($api_data['external_reference'])->explode('order-')->pop();
             }
@@ -405,6 +415,7 @@ class PaymentStatusController extends Controller
         if (is_string($order_id)) {
             $order_id = str($order_id)->explode(':')->pop();
         }
+
         return $order_id;
     }
 
@@ -421,13 +432,13 @@ class PaymentStatusController extends Controller
 
         // Extract the "data.id" from the query params
         $dataID = request('data.id');
-        if (!$dataID) {
+        if (! $dataID) {
             return false;
         }
         // Obtain the secret key for the user/application from Mercadopago developers site
         $secret = config('mercadopago.webhook_secret_key');
 
-        if (!$secret) {
+        if (! $secret) {
             return false;
         }
 
@@ -445,15 +456,15 @@ class PaymentStatusController extends Controller
             if (count($keyValue) == 2) {
                 $key = trim($keyValue[0]);
                 $value = trim($keyValue[1]);
-                if ($key === "ts") {
+                if ($key === 'ts') {
                     $ts = $value;
-                } elseif ($key === "v1") {
+                } elseif ($key === 'v1') {
                     $hash = $value;
                 }
             }
         }
 
-        if (!$ts || !$hash) {
+        if (! $ts || ! $hash) {
             return false;
         }
 
@@ -466,6 +477,7 @@ class PaymentStatusController extends Controller
         if ($sha !== $hash) {
             return false; // HMAC verification failed
         }
+
         return true;
     }
 }

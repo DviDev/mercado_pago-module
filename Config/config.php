@@ -12,17 +12,17 @@ return [
     'webhook_key' => env('MERCADO_PAGO_WEBHOOK_KEY'),
     'webhook_secret_key' => env('MERCADO_PAGO_WEBHOOK_SECRET_KEY'),
     'payment_methods' => [
-        'pix' => env('app_env') == 'local' ? false : env('MERCADO_PAGO_PAYMENT_METHOD_PIX', false)
+        'pix' => env('app_env') == 'local' ? false : env('MERCADO_PAGO_PAYMENT_METHOD_PIX', false),
     ],
     'debug' => [
         'webhook' => [
             'payment' => env('MODULE_DEBUG_WEBHOOK_PAYMENT', false),
             'notification' => env('MODULE_DEBUG_WEBHOOK_NOTIFICATION', false),
-        ]
+        ],
     ],
     'order' => [
         'value' => [
-            'minimum' => env('MERCADO_PAGO_ORDER_VALUE_MINIMUM', 10)
-        ]
-    ]
+            'minimum' => env('MERCADO_PAGO_ORDER_VALUE_MINIMUM', 10),
+        ],
+    ],
 ];

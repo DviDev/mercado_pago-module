@@ -14,7 +14,4 @@ namespace Modules\MercadoPago\Entities\WebhookNotification;
  * @property $user_id
  * @property $created_at
  */
-trait WebhookNotificationProps
-{
-
-}
+trait WebhookNotificationProps {}

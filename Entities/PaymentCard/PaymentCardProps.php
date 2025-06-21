@@ -15,6 +15,4 @@ namespace Modules\MercadoPago\Entities\PaymentCard;
  * @property $created_at
  * @property $updated_at
  */
-trait PaymentCardProps
-{
-}
+trait PaymentCardProps {}

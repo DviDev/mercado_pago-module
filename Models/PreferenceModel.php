@@ -17,8 +17,11 @@ use Modules\Store\Models\OrderModel;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
+ *
  * @link https://github.com/DaviMenezes
+ *
  * @property-read OrderModel $order
+ *
  * @method PreferenceEntityModel toEntity()
  */
 class PreferenceModel extends BaseModel
@@ -35,14 +38,15 @@ class PreferenceModel extends BaseModel
 
     public static function getByStringId($id): ?PreferenceModel
     {
-        return self::whereFn(fn(PreferenceEntityModel $p) => [
-            [$p->mp_preference_id, $id]
+        return self::whereFn(fn (PreferenceEntityModel $p) => [
+            [$p->mp_preference_id, $id],
         ])->first();
     }
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory {
+        return new class extends BaseFactory
+        {
             protected $model = PreferenceModel::class;
         };
     }
@@ -58,46 +62,46 @@ class PreferenceModel extends BaseModel
     }
 
     /**
-     * @param PreferenceItemDTO[] $items
-     * @param PaymentMethodEnum[] $excluded_payment_methods
-     * @param PaymentMethodEnum[] $excluded_payment_types
+     * @param  PreferenceItemDTO[]  $items
+     * @param  PaymentMethodEnum[]  $excluded_payment_methods
+     * @param  PaymentMethodEnum[]  $excluded_payment_types
+     *
      * @throws MPApiException
      */
-    static public function createMpPreference(
+    public static function createMpPreference(
         OrderModel $order,
         array $items,
-        array      $excluded_payment_methods = [],
-        array      $excluded_payment_types = []
-    ): ?PreferenceModel
-    {
-        if (!config('mercadopago.enable')) {
+        array $excluded_payment_methods = [],
+        array $excluded_payment_types = []
+    ): ?PreferenceModel {
+        if (! config('mercadopago.enable')) {
             return null;
         }
 
         foreach ($items as $item) {
-            if (!$item instanceof PreferenceItemDTO) {
+            if (! $item instanceof PreferenceItemDTO) {
                 throw new \InvalidArgumentException(__('mercadopago::preference.All items must be instances of ', ['class' => PreferenceItemDTO::class]));
             }
         }
         try {
             \DB::beginTransaction();
 
-            $preference = new PreferenceModel();
+            $preference = new PreferenceModel;
             $preference->user_id = auth()->user()->id;
             $preference->order_id = $order->id;
             $preference->save();
 
             MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
-            $client = new PreferenceClient();
+            $client = new PreferenceClient;
 
-            $mp_items = collect($items)->map(fn($item) => $item->toArray());
-            $mp_excluded_payment_methods = collect($excluded_payment_methods)->map(fn(PaymentMethodEnum $item) => ['id' => $item->value]);
-            $mp_excluded_payment_types = collect($excluded_payment_types)->map(fn(PaymentMethodEnum $item) => ['id' => $item->value]);
+            $mp_items = collect($items)->map(fn ($item) => $item->toArray());
+            $mp_excluded_payment_methods = collect($excluded_payment_methods)->map(fn (PaymentMethodEnum $item) => ['id' => $item->value]);
+            $mp_excluded_payment_types = collect($excluded_payment_types)->map(fn (PaymentMethodEnum $item) => ['id' => $item->value]);
 
-            $client_array = ["external_reference" => $preference->id];
+            $client_array = ['external_reference' => $preference->id];
 
             if ($mp_items->count() > 0) {
-                $client_array["items"] = $mp_items->toArray();
+                $client_array['items'] = $mp_items->toArray();
             }
             if ($mp_excluded_payment_types->count() > 0) {
                 $client_array['payment_methods']['excluded_payment_types'] = $mp_excluded_payment_types->toArray();
@@ -106,7 +110,7 @@ class PreferenceModel extends BaseModel
                 $client_array['payment_methods']['excluded_payment_methods'] = $mp_excluded_payment_methods->toArray();
             }
 
-            //Todo back_urls testing... wip
+            // Todo back_urls testing... wip
             /*$client_array['back_urls'] = [
                 "success" => route('order.status.success', $order->id),
                 "failure" => route('order.status.failure', $order->id),
@@ -133,5 +137,4 @@ class PreferenceModel extends BaseModel
             throw $exception;
         }
     }
-
 }

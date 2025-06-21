@@ -32,6 +32,4 @@ namespace Modules\MercadoPago\Entities\Payment;
  * @property $point_of_interaction_transaction_qr_code_base64
  * @property $point_of_interaction_transaction_ticket_url
  */
-trait PaymentProps
-{
-}
+trait PaymentProps {}

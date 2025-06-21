@@ -24,7 +24,7 @@ class CreatePreferenceListener
         $items = [];
         foreach ($event->order->items as $item) {
             $items[] = new PreferenceItemDTO(
-                id: $event->order->id . '#' . $item->id,
+                id: $event->order->id.'#'.$item->id,
                 title: $item->description,
                 unit_price: $item->price * $item->quantity
             );

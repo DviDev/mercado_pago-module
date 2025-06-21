@@ -16,9 +16,12 @@ use Modules\Store\Models\OrderModel;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
+ *
  * @link https://github.com/DaviMenezes
+ *
  * @property-read OrderModel $order
  * @property-read PaymentCardModel $card
+ *
  * @method PaymentEntityModel toEntity()
  */
 class PaymentModel extends BaseModel
@@ -36,13 +39,14 @@ class PaymentModel extends BaseModel
     public static function getByMpId(string $id): ?PaymentModel
     {
         $p = PaymentEntityModel::props();
+
         return self::where($p->mp_id, $id)->get()->first();
     }
 
     public static function makeViaApiData(mixed $data): PaymentModel
     {
         $p = PaymentEntityModel::props(null, true);
-        $payment = new PaymentModel();
+        $payment = new PaymentModel;
         $payment->mp_id = $data[$p->id];
         $payment->external_reference = $data[$p->external_reference];
         $payment->collector_id = $data[$p->collector_id];
@@ -58,6 +62,7 @@ class PaymentModel extends BaseModel
         $payment->status = $data[$p->status];
         $payment->status_detail = $data[$p->status_detail];
         $payment->transaction_amount = $data[$p->transaction_amount];
+
         return $payment;
     }
 
@@ -94,21 +99,23 @@ class PaymentModel extends BaseModel
             $p->transaction_details_digitable_line => $payment->transaction_details->digitable_line ?? null,
         ];
         if ($payment->payment_type_id == 'ticket') {
-            if($barcode = $payment->transaction_details->barcode) {
+            if ($barcode = $payment->transaction_details->barcode) {
                 if (is_object($barcode)) {
-                    /**@var Payment\Barcode $barcode */
+                    /** @var Payment\Barcode $barcode */
                     $data[$p->transaction_details_barcode_content] = $barcode->content;
                 } else {
                     $data[$p->transaction_details_barcode_url] = $barcode['content'];
                 }
             }
         }
+
         return PaymentModel::create($data);
     }
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory {
+        return new class extends BaseFactory
+        {
             protected $model = PaymentModel::class;
         };
     }
@@ -127,7 +134,7 @@ class PaymentModel extends BaseModel
     {
         return match ($this->status_detail) {
             'accredited' => 'O pagamento foi aprovado',
-            'cc_rejected_other_reason' => "Seu cartão recusou o pagamento.<br> Use outro cartão ou outro meio de pagamento",
+            'cc_rejected_other_reason' => 'Seu cartão recusou o pagamento.<br> Use outro cartão ou outro meio de pagamento',
             'cc_rejected_call_for_authorize' => 'O cartão foi rejeitado. Ligue para autorizar',
             'cc_rejected_insufficient_amount' => 'O seu cartão não tem limite suficiente',
             'cc_rejected_bad_filled_security_code' => 'O código de segurança do cartão é inválido',
@@ -144,7 +151,8 @@ class PaymentModel extends BaseModel
     public function getMpPayment(): Payment
     {
         MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
-        $client = new PaymentClient();
+        $client = new PaymentClient;
+
         return $client->get($this->mp_id);
     }
 

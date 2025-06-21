@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 
 return new class extends Migration
@@ -27,8 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('mp_payments', function (Blueprint $table) {
-
-        });
+        Schema::table('mp_payments', function (Blueprint $table) {});
     }
 };

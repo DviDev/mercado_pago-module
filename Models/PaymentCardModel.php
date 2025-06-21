@@ -10,8 +10,11 @@ use Modules\MercadoPago\Entities\PaymentCard\PaymentCardProps;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
+ *
  * @link https://github.com/DaviMenezes
+ *
  * @property-read PaymentCardModel $model
+ *
  * @method PaymentCardEntityModel toEntity()
  */
 class PaymentCardModel extends BaseModel
@@ -26,7 +29,8 @@ class PaymentCardModel extends BaseModel
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory {
+        return new class extends BaseFactory
+        {
             protected $model = PaymentCardModel::class;
         };
     }

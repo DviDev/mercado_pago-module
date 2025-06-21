@@ -8,7 +8,9 @@ use Modules\MercadoPago\Models\PreferenceModel;
 
 /**
  * @author Davi Menezes(davimenezes.dev@gmail.com)
+ *
  * @link https://github.com/DaviMenezes
+ *
  * @method self obj()
  * @method PreferenceModel model()
  * @method PreferenceEntityModel find($id)
@@ -20,7 +22,7 @@ use Modules\MercadoPago\Models\PreferenceModel;
 class PreferenceRepository extends BaseRepository
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function modelClass(): string
     {
