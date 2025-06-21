@@ -14,16 +14,14 @@ use Modules\Store\Notifications\NotificationInvoice;
 class OrderStatusService
 {
     public function __construct(
-        public PaymentModel|null $payment = null,
-        public                   $notification = null
-    )
-    {
-    }
+        public ?PaymentModel $payment = null,
+        public $notification = null
+    ) {}
 
     public function checkStatus(): bool
     {
         if (config('mercadopago.debug.webhook.payment')) {
-            \Log::info('Payment Status: ' . $this->payment->status);
+            \Log::info('Payment Status: '.$this->payment->status);
         }
 
         if ($this->canceled()) {
@@ -46,11 +44,11 @@ class OrderStatusService
             return true;
         }
 
-        Log::error("Order Status ----------------------------------------------------------------");
+        Log::error('Order Status ----------------------------------------------------------------');
 
         $superAdmin = User::where('email', env('EMAIL_SUPER_ADMIN'))->first();
         $title = "Status {$this->payment->status} sem tratamento";
-        $description = "Verificar tratamento para o status " . $this->payment->status;
+        $description = 'Verificar tratamento para o status '.$this->payment->status;
 
         Log::error($title);
         Log::error($description);
@@ -171,13 +169,14 @@ class OrderStatusService
         $order = $this->payment->order;
         if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
             Log::info("A ordem $order->id já está paga.");
+
             return true;
         }
 
         $description = $this->payment->getDescription();
         $this->addStatus($order, OrderStatusTypeEnum::paid, $description);
 
-        $this->notify($order, 'O pagamento da ordem ' . $order->id . ' no valor de ' . $this->payment->transaction_amount . ' foi aprovado!', $description);
+        $this->notify($order, 'O pagamento da ordem '.$order->id.' no valor de '.$this->payment->transaction_amount.' foi aprovado!', $description);
 
         return true;
     }
@@ -186,7 +185,7 @@ class OrderStatusService
     {
         $p = PaymentEntityModel::props();
 
-        $access_token = config("mercadopago.access_token");
+        $access_token = config('mercadopago.access_token');
         $data = (new HttpPaymentService($access_token))->run($payment_id);
         if ($data->failed()) {
             return null;
@@ -204,7 +203,7 @@ class OrderStatusService
         }
         $payment = PaymentModel::makeViaApiData($data);
 
-        $payment->description = $description . '-' . $data['description'];
+        $payment->description = $description.'-'.$data['description'];
         $payment->order_id = $order_id;
         $payment->notification_id = $notification_id ?? null;
         $payment->point_of_interaction_type = $data['point_of_interaction']['type'];

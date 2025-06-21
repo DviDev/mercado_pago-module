@@ -8,7 +8,9 @@ use Modules\MercadoPago\Models\WebhookNotificationModel;
 
 /**
  * @author Davi Menezes(davimenezes.dev@gmail.com)
+ *
  * @link https://github.com/DaviMenezes
+ *
  * @method self obj()
  * @method WebhookNotificationModel model()
  * @method WebhookNotificationEntityModel find($id)
@@ -20,7 +22,7 @@ use Modules\MercadoPago\Models\WebhookNotificationModel;
 class WebhookNotificationRepository extends BaseRepository
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function modelClass(): string
     {

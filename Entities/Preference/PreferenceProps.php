@@ -12,7 +12,4 @@ namespace Modules\MercadoPago\Entities\Preference;
  * @property $notification_id
  * @property $created_at
  */
-trait PreferenceProps
-{
-
-}
+trait PreferenceProps {}

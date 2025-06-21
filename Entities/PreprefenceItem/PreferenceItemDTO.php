@@ -8,13 +8,11 @@ class PreferenceItemDTO implements Arrayable
 {
     public function __construct(
         protected string|int $id,
-        protected string     $title,
-        protected float      $unit_price,
-        protected int        $quantity = 1,
-        protected string     $currency_id = "BRL",
-    )
-    {
-    }
+        protected string $title,
+        protected float $unit_price,
+        protected int $quantity = 1,
+        protected string $currency_id = 'BRL',
+    ) {}
 
     public function toArray(): array
     {

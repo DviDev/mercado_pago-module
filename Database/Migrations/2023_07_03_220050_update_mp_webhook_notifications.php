@@ -13,9 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('mp_webhook_notifications', function (Blueprint $table) {
-
-        });
+        Schema::table('mp_webhook_notifications', function (Blueprint $table) {});
     }
 
     /**
@@ -23,8 +21,5 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
-    {
-
-    }
+    public function down() {}
 };

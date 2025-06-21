@@ -11,8 +11,11 @@ use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationProps;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
+ *
  * @link https://github.com/DaviMenezes
+ *
  * @property-read PaymentModel $payment
+ *
  * @method WebhookNotificationEntityModel toEntity()
  */
 class WebhookNotificationModel extends BaseModel
@@ -41,7 +44,8 @@ class WebhookNotificationModel extends BaseModel
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory {
+        return new class extends BaseFactory
+        {
             protected $model = WebhookNotificationModel::class;
         };
     }

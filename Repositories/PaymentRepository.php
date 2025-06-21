@@ -7,7 +7,9 @@ use Modules\MercadoPago\Models\PaymentModel;
 
 /**
  * @author Davi Menezes(davimenezes.dev@gmail.com)
+ *
  * @link https://github.com/DaviMenezes
+ *
  * @method self obj()
  * @method PaymentModel model()
  * @method PaymentModel find($id)
@@ -19,7 +21,7 @@ use Modules\MercadoPago\Models\PaymentModel;
 class PaymentRepository extends BaseRepository
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function modelClass(): string
     {

@@ -8,7 +8,9 @@ use Modules\MercadoPago\Models\UrlNotificationModel;
 
 /**
  * @author Davi Menezes(davimenezes.dev@gmail.com)
+ *
  * @link https://github.com/DaviMenezes
+ *
  * @method self obj()
  * @method UrlNotificationModel model()
  * @method UrlNotificationEntityModel find($id)
@@ -20,7 +22,7 @@ use Modules\MercadoPago\Models\UrlNotificationModel;
 class UrlNotificationRepository extends BaseRepository
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function modelClass(): string
     {

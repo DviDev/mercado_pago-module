@@ -20,12 +20,13 @@ use Modules\Store\Models\OrderStatusModel;
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
  * @copyright Copyright (c) 2022.
+ *
  * @link https://github.com/DaviMenezes
+ *
  * @method PaymentRepository repository()
  */
 class PaymentDomain extends BaseDomain
 {
-
     public function repositoryClass(): string
     {
         return PaymentRepository::class;
@@ -37,19 +38,21 @@ class PaymentDomain extends BaseDomain
 
         $data = (new HttpPaymentService($config))->run($payment_id);
         if ($data->failed()) {
-            Log::error('Mercado pago - getPayment: Erro ao tentar se comunicar. ' . $data->body());
+            Log::error('Mercado pago - getPayment: Erro ao tentar se comunicar. '.$data->body());
+
             return false;
         }
 
         $payment = PaymentModel::makeViaApiData($data->json());
         $payment->order_id = $order->id;
         $payment->save();
+
         return $payment;
     }
 
-    public function getConfig(OrderModel $order): string|null
+    public function getConfig(OrderModel $order): ?string
     {
-        return config("mercadopago.access_token");
+        return config('mercadopago.access_token');
     }
 
     public function checkInProgress(OrderModel $order, PreferenceModel $preference)
@@ -58,7 +61,7 @@ class PaymentDomain extends BaseDomain
         $data = (new HttpPaymentService($this->getConfig($order)))->run($payment->id);
 
         $paymentData = PaymentModel::makeViaApiData($data);
-        $paymentDB = (new PaymentRepository())->find($payment->id);
+        $paymentDB = (new PaymentRepository)->find($payment->id);
         if (in_array($paymentDB->status, [OrderStatusTypeEnum::paid, OrderStatusTypeEnum::rejected])) {
             return;
         }
@@ -82,7 +85,7 @@ class PaymentDomain extends BaseDomain
             ->whereDate($p->created_at, '>=', $date)
             ->groupBy($p->id, $p->data_id)
             ->each(function (WebhookNotificationModel $m) {
-                $data = (new HttpPaymentService(config("mercadopago.access_token")))->run($m->data_id);
+                $data = (new HttpPaymentService(config('mercadopago.access_token')))->run($m->data_id);
                 $external_reference = $data->json('external_reference');
                 $order_id = str($external_reference)->explode('-')->last();
 
@@ -91,8 +94,8 @@ class PaymentDomain extends BaseDomain
                     ->where($p->order_id, $order_id)
                     ->where($p->mp_id, $m->data_id);
 
-                if (!$payment->exists()) {
-                    Log::error('nao existe pgto de ordem ' . $order_id . ' e mp_id ' . $m->data_id);
+                if (! $payment->exists()) {
+                    Log::error('nao existe pgto de ordem '.$order_id.' e mp_id '.$m->data_id);
                 }
             });
         Log::info('FIM de checkWebhookNotifications');
@@ -107,6 +110,7 @@ class PaymentDomain extends BaseDomain
             ->orderBy($p->id);
         if ($builder->count() == 0) {
             Log::info('-- Não há ocorrências');
+
             return;
         }
         $has_occurrence = false;
@@ -114,7 +118,7 @@ class PaymentDomain extends BaseDomain
             $config = $this->getConfig($payment->order);
             $data = (new HttpPaymentService($config))->run($payment->mp_id);
             $external_reference = $data->json('external_reference');
-            $order_id = (int)str($external_reference)->explode('-')->last();
+            $order_id = (int) str($external_reference)->explode('-')->last();
             if ($payment->order_id !== $order_id) {
                 $has_occurrence = true;
                 $str = "UPDATE `mp_payments` SET `order_id`={$order_id} WHERE `id`= $payment->id;";
@@ -122,7 +126,7 @@ class PaymentDomain extends BaseDomain
                 $fn($payment, $order_id);
             }
         });
-        if (!$has_occurrence) {
+        if (! $has_occurrence) {
             Log::info('-- Não há ocorrências');
         }
         Log::info(str_pad('-- ', 100, '-'));
@@ -139,6 +143,7 @@ class PaymentDomain extends BaseDomain
             ->orderBy($p->order_id);
         if ($builder->count() == 0) {
             Log::info('-- Não há ocorrências');
+
             return;
         }
         $has_occurrence = false;
@@ -166,18 +171,18 @@ class PaymentDomain extends BaseDomain
 
             $has_occurrence = true;
         });
-        if (!$has_occurrence) {
+        if (! $has_occurrence) {
             Log::info('-- Não há ocorrências');
         }
         Log::info(str_pad('-- ', 100, '-'));
     }
 
-    public function checkPaymentStatusVsOrderLastStatus(\Closure $fn = null)
+    public function checkPaymentStatusVsOrderLastStatus(?\Closure $fn = null)
     {
-        Log::info("-- Verificando status do pgto(mp) com ultimo status do pedido");
+        Log::info('-- Verificando status do pgto(mp) com ultimo status do pedido');
 
-//        Todos os pedidos que tem pagamentos com data maior que 20 03 2023
-//        Pegar os pedidos da ordem, agrupado por mp_id e pegar o ultimo baseado na data de criacao
+        //        Todos os pedidos que tem pagamentos com data maior que 20 03 2023
+        //        Pegar os pedidos da ordem, agrupado por mp_id e pegar o ultimo baseado na data de criacao
         $order = OrderEntityModel::props();
         $paymentProps = PaymentEntityModel::props(PaymentModel::table());
         $ocurrences = [];
@@ -188,26 +193,30 @@ class PaymentDomain extends BaseDomain
                     ->orderByDesc($paymentProps->date_created)
                     ->orderByDesc($paymentProps->created_at)
                     ->limit(1)->get()
-                    ->each(function (PaymentModel $payment) use ($order, $paymentProps, $fn, &$ocurrences) {
+                    ->each(function (PaymentModel $payment) use ($paymentProps, $fn, &$ocurrences) {
                         if ($payment->status == 'approved' && $payment->order->lastStatusEnum() !== OrderStatusTypeEnum::paid) {
                             $ocurrences[$payment->order_id] = true;
                             $fn($payment, $paymentProps);
+
                             return;
                         }
                         if ($payment->status == 'pending' && $payment->order->lastStatusEnum() !== OrderStatusTypeEnum::pendent) {
                             $ocurrences[$payment->order_id] = true;
                             $fn($payment, $paymentProps);
+
                             return;
                         }
                         if ($payment->status == 'rejected' && $payment->order->lastStatusEnum() !== OrderStatusTypeEnum::rejected) {
                             $ocurrences[$payment->order_id] = true;
                             $fn($payment, $paymentProps);
+
                             return;
                         }
                         if ($payment->status == 'in_process' &&
                             ($payment->order->lastStatusEnum() !== OrderStatusTypeEnum::in_process)) {
                             $ocurrences[$payment->order_id] = true;
                             $fn($payment, $paymentProps);
+
                             return;
                         }
                         if ($payment->status == 'cancelled' &&
@@ -232,7 +241,7 @@ class PaymentDomain extends BaseDomain
             ->selectRaw("count($statusP->type_id)")
             ->where($statusP->type_id, OrderStatusTypeEnum::paid->value)
             ->groupBy($statusP->order_id)
-            ->havingRaw("count($statusP->type_id) > " . OrderStatusTypeEnum::paid->value)
+            ->havingRaw("count($statusP->type_id) > ".OrderStatusTypeEnum::paid->value)
             ->orderBy($statusP->order_id)
             ->each(function (OrderStatusModel $model) use ($fn, $statusP) {
                 $order = OrderModel::find($model->order_id);

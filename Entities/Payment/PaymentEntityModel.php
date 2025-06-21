@@ -3,13 +3,16 @@
 namespace Modules\MercadoPago\Entities\Payment;
 
 use Modules\Base\Entities\BaseEntityModel;
-use Modules\MercadoPago\Repositories\PaymentRepository;
 use Modules\MercadoPago\Models\PaymentModel;
+use Modules\MercadoPago\Repositories\PaymentRepository;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
+ *
  * @link https://github.com/DaviMenezes
+ *
  * @property-read PaymentModel $model
+ *
  * @method self save()
  * @method static self new()
  * @method static self props($alias = null, $force = null)

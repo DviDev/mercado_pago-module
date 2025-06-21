@@ -17,7 +17,4 @@ namespace Modules\MercadoPago\Entities\UrlNotification;
  * @property $merchant_account_id
  * @property $created_at
  */
-trait UrlNotificationProps
-{
-
-}
+trait UrlNotificationProps {}
