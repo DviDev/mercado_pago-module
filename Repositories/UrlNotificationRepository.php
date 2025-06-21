@@ -2,6 +2,7 @@
 
 namespace Modules\MercadoPago\Repositories;
 
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Base\Repository\BaseRepository;
 use Modules\MercadoPago\Entities\UrlNotification\UrlNotificationEntityModel;
 use Modules\MercadoPago\Models\UrlNotificationModel;
@@ -16,7 +17,7 @@ use Modules\MercadoPago\Models\UrlNotificationModel;
  * @method UrlNotificationEntityModel find($id)
  * @method UrlNotificationModel first()
  * @method UrlNotificationModel findOrNew($id)
- * @method UrlNotificationModel firstOrNew($query)
+ * @method UrlNotificationModel firstOrNew(Builder|\Illuminate\Database\Query\Builder $query)
  * @method UrlNotificationEntityModel findOrFail($id)
  */
 class UrlNotificationRepository extends BaseRepository

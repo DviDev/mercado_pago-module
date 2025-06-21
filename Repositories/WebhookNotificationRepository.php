@@ -2,6 +2,7 @@
 
 namespace Modules\MercadoPago\Repositories;
 
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Base\Repository\BaseRepository;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationEntityModel;
 use Modules\MercadoPago\Models\WebhookNotificationModel;
@@ -16,7 +17,7 @@ use Modules\MercadoPago\Models\WebhookNotificationModel;
  * @method WebhookNotificationEntityModel find($id)
  * @method WebhookNotificationModel first()
  * @method WebhookNotificationModel findOrNew($id)
- * @method WebhookNotificationModel firstOrNew($query)
+ * @method WebhookNotificationModel firstOrNew(Builder|\Illuminate\Database\Query\Builder $query)
  * @method WebhookNotificationEntityModel findOrFail($id)
  */
 class WebhookNotificationRepository extends BaseRepository
