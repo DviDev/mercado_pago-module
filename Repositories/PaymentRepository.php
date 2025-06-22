@@ -2,6 +2,7 @@
 
 namespace Modules\MercadoPago\Repositories;
 
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Base\Repository\BaseRepository;
 use Modules\MercadoPago\Models\PaymentModel;
 
@@ -15,7 +16,7 @@ use Modules\MercadoPago\Models\PaymentModel;
  * @method PaymentModel find($id)
  * @method PaymentModel first()
  * @method PaymentModel findOrNew($id)
- * @method PaymentModel firstOrNew($query)
+ * @method PaymentModel firstOrNew(Builder|\Illuminate\Database\Query\Builder $query)
  * @method PaymentModel findOrFail($id)
  */
 class PaymentRepository extends BaseRepository
