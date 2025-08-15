@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Resources\Payment;
+use Modules\Base\Contracts\BaseModel;
 use Modules\Base\Factories\BaseFactory;
-use Modules\Base\Models\BaseModel;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 use Modules\MercadoPago\Entities\Payment\PaymentProps;
 use Modules\Store\Models\OrderModel;
+
+;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)

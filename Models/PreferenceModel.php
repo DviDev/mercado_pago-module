@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
+use Modules\Base\Contracts\BaseModel;
 use Modules\Base\Factories\BaseFactory;
-use Modules\Base\Models\BaseModel;
 use Modules\MercadoPago\Entities\PaymentMethod\PaymentMethodEnum;
 use Modules\MercadoPago\Entities\Preference\PreferenceEntityModel;
 use Modules\MercadoPago\Entities\Preference\PreferenceProps;
 use Modules\MercadoPago\Entities\PreprefenceItem\PreferenceItemDTO;
 use Modules\Store\Models\OrderModel;
+
+;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
