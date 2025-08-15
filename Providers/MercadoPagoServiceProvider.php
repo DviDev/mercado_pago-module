@@ -4,7 +4,7 @@ namespace Modules\MercadoPago\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Modules\MercadoPago\Listeners\CreatePreferenceListener;
-use Modules\Store\App\Events\OrderWithItemsCreatedEvent;
+use Modules\Store\Events\OrderWithItemsCreatedEvent;
 
 class MercadoPagoServiceProvider extends ServiceProvider
 {

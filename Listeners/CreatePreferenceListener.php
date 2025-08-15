@@ -4,7 +4,7 @@ namespace Modules\MercadoPago\Listeners;
 
 use Modules\MercadoPago\Entities\PreprefenceItem\PreferenceItemDTO;
 use Modules\MercadoPago\Models\PreferenceModel;
-use Modules\Store\App\Events\OrderWithItemsCreatedEvent;
+use Modules\Store\Events\OrderWithItemsCreatedEvent;
 
 class CreatePreferenceListener
 {
