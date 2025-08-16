@@ -4,10 +4,12 @@ namespace Modules\MercadoPago\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Modules\Base\Contracts\BaseModel;
 use Modules\Base\Factories\BaseFactory;
-use Modules\Base\Models\BaseModel;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationEntityModel;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationProps;
+
+;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)

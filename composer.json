@@ -18,7 +18,10 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\MercadoPago\\": ""
+            "Modules\\MercadoPago\\": "app/",
+            "Modules\\MercadoPago\\Database\\Seeders\\": "database/Seeders/",
+            "Modules\\MercadoPago\\Database\\Factories\\": "database/Factories/",
+            "Modules\\MercadoPago\\Database\\Migrations\\": "database/Migrations/"
         }
     }
 }
