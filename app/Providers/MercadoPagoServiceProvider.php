@@ -25,12 +25,11 @@ class MercadoPagoServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        \Event::listen(OrderWithItemsCreatedEvent::class, CreatePreferenceListener::class);
 
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+        $this->loadMigrationsFrom(module_path($this->moduleName, 'database/Migrations'));
     }
 
     /**
@@ -41,6 +40,9 @@ class MercadoPagoServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->register(RouteServiceProvider::class);
+
+        \Event::listen(OrderWithItemsCreatedEvent::class, CreatePreferenceListener::class);
+
     }
 
     /**
@@ -51,10 +53,10 @@ class MercadoPagoServiceProvider extends ServiceProvider
     protected function registerConfig()
     {
         $this->publishes([
-            module_path($this->moduleName, 'Config/config.php') => config_path($this->moduleNameLower.'.php'),
+            module_path($this->moduleName, 'config/config.php') => config_path($this->moduleNameLower.'.php'),
         ], 'config');
         $this->mergeConfigFrom(
-            module_path($this->moduleName, 'Config/config.php'), $this->moduleNameLower
+            module_path($this->moduleName, 'config/config.php'), $this->moduleNameLower
         );
     }
 
@@ -67,7 +69,7 @@ class MercadoPagoServiceProvider extends ServiceProvider
     {
         $viewPath = resource_path('views/modules/'.$this->moduleNameLower);
 
-        $sourcePath = module_path($this->moduleName, 'Resources/views');
+        $sourcePath = module_path($this->moduleName, 'resources/views');
 
         $this->publishes([
             $sourcePath => $viewPath,
@@ -88,10 +90,10 @@ class MercadoPagoServiceProvider extends ServiceProvider
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
             $this->loadJsonTranslationsFrom($langPath);
-        } else {
-            $this->loadTranslationsFrom(module_path($this->moduleName, 'Resources/lang'), $this->moduleNameLower);
-            $this->loadJsonTranslationsFrom(module_path($this->moduleName, 'Resources/lang'));
+            return;
         }
+        $this->loadTranslationsFrom(module_path($this->moduleName, 'lang'), $this->moduleNameLower);
+        $this->loadJsonTranslationsFrom(module_path($this->moduleName, 'lang'));
     }
 
     /**
