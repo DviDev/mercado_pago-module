@@ -19,7 +19,6 @@ use Modules\MercadoPago\Entities\UrlNotification\UrlNotificationProps;
  */
 class UrlNotificationModel extends BaseModel
 {
-    use HasFactory;
     use UrlNotificationProps;
 
     protected $fillable = [
@@ -43,8 +42,7 @@ class UrlNotificationModel extends BaseModel
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory
-        {
+        return new class extends BaseFactory {
             protected $model = UrlNotificationModel::class;
         };
     }

@@ -21,7 +21,6 @@ use Modules\MercadoPago\Entities\PaymentCard\PaymentCardProps;
  */
 class PaymentCardModel extends BaseModel
 {
-    use HasFactory;
     use PaymentCardProps;
 
     public static function table($alias = null): string
@@ -31,8 +30,7 @@ class PaymentCardModel extends BaseModel
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory
-        {
+        return new class extends BaseFactory {
             protected $model = PaymentCardModel::class;
         };
     }

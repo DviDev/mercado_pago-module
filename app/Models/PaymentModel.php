@@ -28,7 +28,6 @@ use Modules\Store\Models\OrderModel;
  */
 class PaymentModel extends BaseModel
 {
-    use HasFactory;
     use PaymentProps;
 
     protected $casts = ['created_at' => 'datetime'];
@@ -116,8 +115,7 @@ class PaymentModel extends BaseModel
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory
-        {
+        return new class extends BaseFactory {
             protected $model = PaymentModel::class;
         };
     }
