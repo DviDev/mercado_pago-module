@@ -22,11 +22,9 @@ use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationProps;
  */
 class WebhookNotificationModel extends BaseModel
 {
-    use HasFactory;
     use WebhookNotificationProps;
 
     protected $casts = ['live_mode' => 'boolean'];
-
     protected $fillable = [
         'action',
         'api_version',
@@ -46,8 +44,7 @@ class WebhookNotificationModel extends BaseModel
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory
-        {
+        return new class extends BaseFactory {
             protected $model = WebhookNotificationModel::class;
         };
     }
