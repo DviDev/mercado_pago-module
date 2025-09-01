@@ -8,17 +8,7 @@ use Modules\Store\Events\OrderWithItemsCreatedEvent;
 
 class CreatePreferenceListener
 {
-    /**
-     * Create the event listener.
-     */
-    public function __construct()
-    {
-        //
-    }
 
-    /**
-     * Handle the event.
-     */
     public function handle(OrderWithItemsCreatedEvent $event): void
     {
         $items = [];
