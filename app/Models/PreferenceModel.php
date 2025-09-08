@@ -2,7 +2,6 @@
 
 namespace Modules\MercadoPago\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Exceptions\MPApiException;
@@ -14,8 +13,6 @@ use Modules\MercadoPago\Entities\Preference\PreferenceEntityModel;
 use Modules\MercadoPago\Entities\Preference\PreferenceProps;
 use Modules\MercadoPago\Entities\PreprefenceItem\PreferenceItemDTO;
 use Modules\Store\Models\OrderModel;
-
-;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
@@ -39,14 +36,15 @@ class PreferenceModel extends BaseModel
 
     public static function getByStringId($id): ?PreferenceModel
     {
-        return self::whereFn(fn(PreferenceEntityModel $p) => [
+        return self::whereFn(fn (PreferenceEntityModel $p) => [
             [$p->mp_preference_id, $id],
         ])->first();
     }
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory {
+        return new class extends BaseFactory
+        {
             protected $model = PreferenceModel::class;
         };
     }
@@ -62,25 +60,24 @@ class PreferenceModel extends BaseModel
     }
 
     /**
-     * @param PreferenceItemDTO[] $items
-     * @param PaymentMethodEnum[] $excluded_payment_methods
-     * @param PaymentMethodEnum[] $excluded_payment_types
+     * @param  PreferenceItemDTO[]  $items
+     * @param  PaymentMethodEnum[]  $excluded_payment_methods
+     * @param  PaymentMethodEnum[]  $excluded_payment_types
      *
      * @throws MPApiException
      */
     public static function createMpPreference(
         OrderModel $order,
-        array      $items,
-        array      $excluded_payment_methods = [],
-        array      $excluded_payment_types = []
-    ): ?PreferenceModel
-    {
-        if (!config('mercadopago.enable')) {
+        array $items,
+        array $excluded_payment_methods = [],
+        array $excluded_payment_types = []
+    ): ?PreferenceModel {
+        if (! config('mercadopago.enable')) {
             return null;
         }
 
         foreach ($items as $item) {
-            if (!$item instanceof PreferenceItemDTO) {
+            if (! $item instanceof PreferenceItemDTO) {
                 throw new \InvalidArgumentException(__('mercadopago::preference.All items must be instances of ', ['class' => PreferenceItemDTO::class]));
             }
         }
@@ -95,9 +92,9 @@ class PreferenceModel extends BaseModel
             MercadoPagoConfig::setAccessToken(config('mercadopago.access_token'));
             $client = new PreferenceClient;
 
-            $mp_items = collect($items)->map(fn($item) => $item->toArray());
-            $mp_excluded_payment_methods = collect($excluded_payment_methods)->map(fn(PaymentMethodEnum $item) => ['id' => $item->value]);
-            $mp_excluded_payment_types = collect($excluded_payment_types)->map(fn(PaymentMethodEnum $item) => ['id' => $item->value]);
+            $mp_items = collect($items)->map(fn ($item) => $item->toArray());
+            $mp_excluded_payment_methods = collect($excluded_payment_methods)->map(fn (PaymentMethodEnum $item) => ['id' => $item->value]);
+            $mp_excluded_payment_types = collect($excluded_payment_types)->map(fn (PaymentMethodEnum $item) => ['id' => $item->value]);
 
             $client_array = ['external_reference' => $preference->id];
 

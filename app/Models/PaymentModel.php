@@ -2,7 +2,6 @@
 
 namespace Modules\MercadoPago\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use MercadoPago\Client\Payment\PaymentClient;
@@ -13,8 +12,6 @@ use Modules\Base\Factories\BaseFactory;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 use Modules\MercadoPago\Entities\Payment\PaymentProps;
 use Modules\Store\Models\OrderModel;
-
-;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
@@ -115,7 +112,8 @@ class PaymentModel extends BaseModel
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory {
+        return new class extends BaseFactory
+        {
             protected $model = PaymentModel::class;
         };
     }

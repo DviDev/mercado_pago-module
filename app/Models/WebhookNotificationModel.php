@@ -2,14 +2,11 @@
 
 namespace Modules\MercadoPago\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Modules\Base\Contracts\BaseModel;
 use Modules\Base\Factories\BaseFactory;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationEntityModel;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationProps;
-
-;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
@@ -25,6 +22,7 @@ class WebhookNotificationModel extends BaseModel
     use WebhookNotificationProps;
 
     protected $casts = ['live_mode' => 'boolean'];
+
     protected $fillable = [
         'action',
         'api_version',
@@ -44,7 +42,8 @@ class WebhookNotificationModel extends BaseModel
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory {
+        return new class extends BaseFactory
+        {
             protected $model = WebhookNotificationModel::class;
         };
     }

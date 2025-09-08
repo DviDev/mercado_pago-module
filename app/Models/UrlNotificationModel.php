@@ -2,13 +2,10 @@
 
 namespace Modules\MercadoPago\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Base\Contracts\BaseModel;
 use Modules\Base\Factories\BaseFactory;
 use Modules\MercadoPago\Entities\UrlNotification\UrlNotificationEntityModel;
 use Modules\MercadoPago\Entities\UrlNotification\UrlNotificationProps;
-
-;
 
 /**
  * @author Davi Menezes (davimenezes.dev@gmail.com)
@@ -42,7 +39,8 @@ class UrlNotificationModel extends BaseModel
 
     protected static function newFactory(): BaseFactory
     {
-        return new class extends BaseFactory {
+        return new class extends BaseFactory
+        {
             protected $model = UrlNotificationModel::class;
         };
     }

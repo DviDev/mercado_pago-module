@@ -90,6 +90,7 @@ class MercadoPagoServiceProvider extends ServiceProvider
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
             $this->loadJsonTranslationsFrom($langPath);
+
             return;
         }
         $this->loadTranslationsFrom(module_path($this->moduleName, 'lang'), $this->moduleNameLower);
