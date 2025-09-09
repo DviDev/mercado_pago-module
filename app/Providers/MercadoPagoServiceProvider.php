@@ -2,120 +2,43 @@
 
 namespace Modules\MercadoPago\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Modules\Base\Contracts\BaseServiceProviderContract;
+use Modules\DBMap\Events\ScanTableEvent;
+use Modules\MercadoPago\Listeners\CreateMenuItemsMercadoPagoListener;
 use Modules\MercadoPago\Listeners\CreatePreferenceListener;
+use Modules\MercadoPago\Listeners\DefineSearchableMercadoPagoAttributes;
+use Modules\MercadoPago\Listeners\ScanTableMercadoPagoListener;
+use Modules\MercadoPago\Listeners\TranslateViewElementPropertiesMercadoPagoListener;
+use Modules\Project\Events\CreateMenuItemsEvent;
 use Modules\Store\Events\OrderWithItemsCreatedEvent;
+use Modules\View\Events\DefineSearchableAttributesEvent;
+use Modules\View\Events\ElementPropertyCreatingEvent;
 
-class MercadoPagoServiceProvider extends ServiceProvider
+class MercadoPagoServiceProvider extends BaseServiceProviderContract
 {
-    /**
-     * @var string
-     */
-    protected $moduleName = 'MercadoPago';
-
-    /**
-     * @var string
-     */
-    protected $moduleNameLower = 'mercadopago';
-
-    /**
-     * Boot the application events.
-     *
-     * @return void
-     */
-    public function boot()
+    public function provides(): array
     {
-
-        $this->registerTranslations();
-        $this->registerConfig();
-        $this->registerViews();
-        $this->loadMigrationsFrom(module_path($this->moduleName, 'database/Migrations'));
+        return [
+            RouteServiceProvider::class,
+        ];
     }
 
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register()
+    public function getModuleName(): string
     {
-        $this->app->register(RouteServiceProvider::class);
+        return 'MercadoPago';
+    }
 
+    public function getModuleNameLower(): string
+    {
+        return 'mercadopago';
+    }
+
+    protected function registerEvents(): void
+    {
         \Event::listen(OrderWithItemsCreatedEvent::class, CreatePreferenceListener::class);
-
-    }
-
-    /**
-     * Register config.
-     *
-     * @return void
-     */
-    protected function registerConfig()
-    {
-        $this->publishes([
-            module_path($this->moduleName, 'config/config.php') => config_path($this->moduleNameLower.'.php'),
-        ], 'config');
-        $this->mergeConfigFrom(
-            module_path($this->moduleName, 'config/config.php'), $this->moduleNameLower
-        );
-    }
-
-    /**
-     * Register views.
-     *
-     * @return void
-     */
-    public function registerViews()
-    {
-        $viewPath = resource_path('views/modules/'.$this->moduleNameLower);
-
-        $sourcePath = module_path($this->moduleName, 'resources/views');
-
-        $this->publishes([
-            $sourcePath => $viewPath,
-        ], ['views', $this->moduleNameLower.'-module-views']);
-
-        $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->moduleNameLower);
-    }
-
-    /**
-     * Register translations.
-     *
-     * @return void
-     */
-    public function registerTranslations()
-    {
-        $langPath = resource_path('lang/modules/'.$this->moduleNameLower);
-
-        if (is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
-            $this->loadJsonTranslationsFrom($langPath);
-
-            return;
-        }
-        $this->loadTranslationsFrom(module_path($this->moduleName, 'lang'), $this->moduleNameLower);
-        $this->loadJsonTranslationsFrom(module_path($this->moduleName, 'lang'));
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return [];
-    }
-
-    private function getPublishableViewPaths(): array
-    {
-        $paths = [];
-        foreach (\Config::get('view.paths') as $path) {
-            if (is_dir($path.'/modules/'.$this->moduleNameLower)) {
-                $paths[] = $path.'/modules/'.$this->moduleNameLower;
-            }
-        }
-
-        return $paths;
+        \Event::listen(CreateMenuItemsEvent::class, CreateMenuItemsMercadoPagoListener::class);
+        \Event::listen(DefineSearchableAttributesEvent::class, DefineSearchableMercadoPagoAttributes::class);
+        \Event::listen(ScanTableEvent::class, ScanTableMercadoPagoListener::class);
+        \Event::listen(ElementPropertyCreatingEvent::class, TranslateViewElementPropertiesMercadoPagoListener::class);
     }
 }
