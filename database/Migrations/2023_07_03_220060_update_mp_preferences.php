@@ -7,11 +7,7 @@ use Modules\MercadoPago\Entities\Preference\PreferenceEntityModel;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
+
     public function up()
     {
         Schema::table('mp_preferences', function (Blueprint $table) {
@@ -22,11 +18,7 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
+
     public function down()
     {
         Schema::table('', function (Blueprint $table) {});
