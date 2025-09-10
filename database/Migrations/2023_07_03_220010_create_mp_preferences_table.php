@@ -7,7 +7,6 @@ use Modules\MercadoPago\Entities\Preference\PreferenceEntityModel;
 
 return new class extends Migration
 {
-
     public function up()
     {
         Schema::create('mp_preferences', function (Blueprint $table) {
@@ -28,7 +27,6 @@ return new class extends Migration
             $table->timestamp($p->created_at)->nullable();
         });
     }
-
 
     public function down()
     {

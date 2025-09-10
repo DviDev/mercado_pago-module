@@ -6,12 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up()
     {
         Schema::table('mp_webhook_notifications', function (Blueprint $table) {});
     }
-
 
     public function down() {}
 };

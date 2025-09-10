@@ -7,7 +7,6 @@ use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 
 return new class extends Migration
 {
-
     public function up()
     {
         Schema::table('mp_payments', function (Blueprint $table) {
@@ -16,7 +15,6 @@ return new class extends Migration
                 ->references('id')->on('mp_back_url_notifications')->cascadeOnUpdate()->restrictOnDelete();
         });
     }
-
 
     public function down()
     {

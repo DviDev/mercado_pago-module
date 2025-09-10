@@ -7,7 +7,6 @@ use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 
 return new class extends Migration
 {
-
     public function up()
     {
         Schema::table('mp_payments', function (Blueprint $table) {
@@ -15,7 +14,6 @@ return new class extends Migration
             $table->string($p->external_reference)->nullable();
         });
     }
-
 
     public function down()
     {

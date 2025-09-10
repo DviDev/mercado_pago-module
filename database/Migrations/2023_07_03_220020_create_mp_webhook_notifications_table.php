@@ -7,7 +7,6 @@ use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationEntityMo
 
 return new class extends Migration
 {
-
     public function up()
     {
         Schema::create('mp_webhook_notifications', function (Blueprint $table) {
@@ -25,7 +24,6 @@ return new class extends Migration
             $table->timestamp($p->created_at)->nullable();
         });
     }
-
 
     public function down()
     {

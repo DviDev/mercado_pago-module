@@ -7,7 +7,6 @@ use Modules\MercadoPago\Entities\Preference\PreferenceEntityModel;
 
 return new class extends Migration
 {
-
     public function up()
     {
         Schema::table('mp_preferences', function (Blueprint $table) {
@@ -18,7 +17,6 @@ return new class extends Migration
             $table->string($p->notification_id)->nullable()->change();
         });
     }
-
 
     public function down()
     {

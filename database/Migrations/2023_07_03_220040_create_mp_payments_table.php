@@ -7,7 +7,6 @@ use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 
 return new class extends Migration
 {
-
     public function up()
     {
         Schema::create('mp_payments', function (Blueprint $table) {
@@ -41,7 +40,6 @@ return new class extends Migration
             $table->timestamp($p->created_at)->nullable();
         });
     }
-
 
     public function down()
     {

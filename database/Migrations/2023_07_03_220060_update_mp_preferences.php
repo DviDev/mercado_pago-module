@@ -7,7 +7,6 @@ use Modules\MercadoPago\Entities\Preference\PreferenceEntityModel;
 
 return new class extends Migration
 {
-
     public function up()
     {
         Schema::table('mp_preferences', function (Blueprint $table) {
@@ -17,7 +16,6 @@ return new class extends Migration
             $table->dropColumn('payment_id');
         });
     }
-
 
     public function down()
     {

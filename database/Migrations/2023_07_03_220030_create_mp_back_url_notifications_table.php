@@ -7,7 +7,6 @@ use Modules\MercadoPago\Entities\UrlNotification\UrlNotificationEntityModel;
 
 return new class extends Migration
 {
-
     public function up()
     {
         Schema::create('mp_back_url_notifications', function (Blueprint $table) {
@@ -30,7 +29,6 @@ return new class extends Migration
             $table->comment('guarda parametros das urls de retorno do mp');
         });
     }
-
 
     public function down()
     {
