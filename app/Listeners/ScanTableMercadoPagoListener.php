@@ -8,6 +8,6 @@ class ScanTableMercadoPagoListener
 {
     public function handle($event): void
     {
-        new ScanTableDomain()->scan('MercadoPago');
+        (new ScanTableDomain)->scan('MercadoPago');
     }
 }
