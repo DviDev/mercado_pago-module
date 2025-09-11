@@ -7,11 +7,6 @@ use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('mp_payments', function (Blueprint $table) {
@@ -46,11 +41,6 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::dropIfExists('mp_payments');
