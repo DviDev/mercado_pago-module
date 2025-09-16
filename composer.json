@@ -23,5 +23,10 @@
             "Modules\\MercadoPago\\Database\\Factories\\": "database/Factories/",
             "Modules\\MercadoPago\\Database\\Migrations\\": "database/Migrations/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Builder\\Tests\\": "tests/"
+        }
     }
 }
