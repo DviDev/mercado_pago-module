@@ -8,6 +8,9 @@
             "email": "davimenezes.dev@gmail.com"
         }
     ],
+    "require": {
+        "mercadopago/dx-php": "^3.7.0"
+    },
     "extra": {
         "laravel": {
             "providers": [],
@@ -26,7 +29,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Modules\\Builder\\Tests\\": "tests/"
+            "Modules\\MercadoPago\\Tests\\": "tests/"
         }
     }
 }
