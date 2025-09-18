@@ -17,7 +17,7 @@ return new class extends Migration
             $table->bigInteger($p->data_id)->nullable()->unsigned();
             $table->string($p->date_created)->nullable();
             $table->bigInteger($p->mp_id)->nullable()->unsigned();
-            $table->boolean($p->live_mode)->nullable();
+            $table->boolean($p->live_mode)->unsigned()->nullable();
             $table->char($p->type)->nullable();
             $table->bigInteger($p->user_id)->nullable()->unsigned();
 
