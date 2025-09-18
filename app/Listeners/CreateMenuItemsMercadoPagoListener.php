@@ -6,7 +6,7 @@ use Modules\Project\Contracts\CreateMenuItemsListenerContract;
 
 class CreateMenuItemsMercadoPagoListener extends CreateMenuItemsListenerContract
 {
-    public function moduleName(): string
+    protected function moduleName(): string
     {
         return config('mercadopago.name');
     }
