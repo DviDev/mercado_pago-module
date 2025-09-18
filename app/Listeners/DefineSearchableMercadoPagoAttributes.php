@@ -11,7 +11,7 @@ class DefineSearchableMercadoPagoAttributes extends DefineSearchableAttributesCo
         return config('mercadopago.name');
     }
 
-    public function searchableFields(): array
+    protected function searchableFields(): array
     {
         return [];
     }
