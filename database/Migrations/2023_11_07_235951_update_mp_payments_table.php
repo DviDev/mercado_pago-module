@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('mp_payments', function (Blueprint $table) {
+        Schema::table('mp_payments', function (Blueprint $table): void {
             $p = PaymentEntityModel::props(force: true);
             $table->string($p->external_reference)->nullable();
         });
@@ -19,6 +19,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::table('mp_payments', function (Blueprint $table) {});
+        Schema::table('mp_payments', function (Blueprint $table): void {});
     }
 };

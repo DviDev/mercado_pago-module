@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('mp_payments', function (Blueprint $table) {
+        Schema::table('mp_payments', function (Blueprint $table): void {
             $p = PaymentEntityModel::props(null, true);
             $table->foreignId($p->url_notification_id)->unsigned()->nullable()->after($p->notification_id)
                 ->references('id')->on('mp_back_url_notifications')->cascadeOnUpdate()->restrictOnDelete();
@@ -20,6 +20,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::table('', function (Blueprint $table) {});
+        Schema::table('', function (Blueprint $table): void {});
     }
 };

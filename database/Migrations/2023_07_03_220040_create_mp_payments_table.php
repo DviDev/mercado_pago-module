@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('mp_payments', function (Blueprint $table) {
+        Schema::create('mp_payments', function (Blueprint $table): void {
             $p = PaymentEntityModel::props(null, true);
             $table->id();
 

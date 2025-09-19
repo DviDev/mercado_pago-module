@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mp_payment_cards', function (Blueprint $table) {
+        Schema::create('mp_payment_cards', function (Blueprint $table): void {
             $p = PaymentCardEntityModel::props(force: true);
             $table->id();
             $table->foreignId($p->payment_id)->references('id')->on('mp_payments')

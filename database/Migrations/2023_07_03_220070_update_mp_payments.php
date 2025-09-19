@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('mp_payments', function (Blueprint $table) {
+        Schema::table('mp_payments', function (Blueprint $table): void {
             if (DB::getDefaultConnection() === 'sqlite') {
                 return;
             }
@@ -21,6 +21,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::table('', function (Blueprint $table) {});
+        Schema::table('', function (Blueprint $table): void {});
     }
 };

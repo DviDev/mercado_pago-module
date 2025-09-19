@@ -87,7 +87,7 @@ final class PaymentDomain extends BaseDomain
             ->select($p->id, $p->data_id)
             ->whereDate($p->created_at, '>=', $date)
             ->groupBy($p->id, $p->data_id)
-            ->each(function (WebhookNotificationModel $m) {
+            ->each(function (WebhookNotificationModel $m): void {
                 $data = (new HttpPaymentService(config('mercadopago.access_token')))->run($m->data_id);
                 $external_reference = $data->json('external_reference');
                 $order_id = str($external_reference)->explode('-')->last();
@@ -117,7 +117,7 @@ final class PaymentDomain extends BaseDomain
             return;
         }
         $has_occurrence = false;
-        $builder->each(function (PaymentModel $payment) use ($fn, &$has_occurrence) {
+        $builder->each(function (PaymentModel $payment) use ($fn, &$has_occurrence): void {
             $config = $this->getConfig($payment->order);
             $data = (new HttpPaymentService($config))->run($payment->mp_id);
             $external_reference = $data->json('external_reference');
@@ -150,7 +150,7 @@ final class PaymentDomain extends BaseDomain
             return;
         }
         $has_occurrence = false;
-        $builder->each(function (PaymentModel $model) use ($p, $fn, &$has_occurrence) {
+        $builder->each(function (PaymentModel $model) use ($p, $fn, &$has_occurrence): void {
             $white_list_ids = PaymentModel::query()
                 ->selectRaw("min($p->id) as id")
                 ->where($p->order_id, $model->order_id)
@@ -191,12 +191,12 @@ final class PaymentDomain extends BaseDomain
         $ocurrences = [];
         OrderModel::query()
             ->whereDate($order->created_at, '>=', '2023-03-20')
-            ->each(function (OrderModel $order) use ($paymentProps, $fn, &$ocurrences) {
+            ->each(function (OrderModel $order) use ($paymentProps, $fn, &$ocurrences): void {
                 PaymentModel::query()->where($paymentProps->order_id, $order->id)
                     ->orderByDesc($paymentProps->date_created)
                     ->orderByDesc($paymentProps->created_at)
                     ->limit(1)->get()
-                    ->each(function (PaymentModel $payment) use ($paymentProps, $fn, &$ocurrences) {
+                    ->each(function (PaymentModel $payment) use ($paymentProps, $fn, &$ocurrences): void {
                         if ($payment->status === 'approved' && $payment->order->lastStatusEnum() !== OrderStatusTypeEnum::paid) {
                             $ocurrences[$payment->order_id] = true;
                             $fn($payment, $paymentProps);
@@ -246,10 +246,10 @@ final class PaymentDomain extends BaseDomain
             ->groupBy($statusP->order_id)
             ->havingRaw("count($statusP->type_id) > ".OrderStatusTypeEnum::paid->value)
             ->orderBy($statusP->order_id)
-            ->each(function (OrderStatusModel $model) use ($fn, $statusP) {
+            ->each(function (OrderStatusModel $model) use ($fn, $statusP): void {
                 $order = OrderModel::find($model->order_id);
                 $order->statuses()->where($statusP->type_id, OrderStatusTypeEnum::paid->value)
-                    ->each(function (OrderStatusModel $status) use ($fn, $statusP) {
+                    ->each(function (OrderStatusModel $status) use ($fn, $statusP): void {
                         $fn($status, $statusP);
                         Log::info("-- SELECT * FROM store_order_status WHERE order_id={$status->order_id};");
                         Log::info("DELETE FROM `store_order_status` WHERE order_id={$status->order_id} AND `id`=$status->id;");

@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('mp_preferences', function (Blueprint $table) {
+        Schema::create('mp_preferences', function (Blueprint $table): void {
             $p = PreferenceEntityModel::props(null, true);
             $table->id();
             $table->foreignId($p->user_id)->references('id')->on('users')

@@ -329,7 +329,7 @@ class PaymentStatusController extends Controller
 
     protected function clearCartItems(): void
     {
-        CartModel::getByLoggedUser()->items()->each(function (CartItemModel $cartItem) {
+        CartModel::getByLoggedUser()->items()->each(function (CartItemModel $cartItem): void {
             $cartItem->delete();
         });
     }

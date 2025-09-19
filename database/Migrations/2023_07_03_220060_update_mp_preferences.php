@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('mp_preferences', function (Blueprint $table) {
+        Schema::table('mp_preferences', function (Blueprint $table): void {
             $p = PreferenceEntityModel::props(null, true);
             $table->bigInteger($p->collector_id)->unsigned()->change();
             $table->bigInteger($p->client_id)->unsigned()->change();
@@ -21,6 +21,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::table('', function (Blueprint $table) {});
+        Schema::table('', function (Blueprint $table): void {});
     }
 };

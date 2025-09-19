@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('mp_back_url_notifications', function (Blueprint $table) {
+        Schema::create('mp_back_url_notifications', function (Blueprint $table): void {
             $p = UrlNotificationEntityModel::props(null, true);
             $table->id();
             $table->bigInteger($p->collection_id)->unsigned()->nullable();
