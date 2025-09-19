@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Database\Seeders;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\Base\Database\Seeders\BaseSeeder;
 
-class MercadoPagoDatabaseSeeder extends BaseSeeder
+final class MercadoPagoDatabaseSeeder extends BaseSeeder
 {
     /**
      * Run the database seeds.

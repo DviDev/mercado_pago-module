@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Entities\UrlNotification;
 
 use Modules\Base\Entities\BaseEntityModel;
@@ -18,7 +20,7 @@ use Modules\MercadoPago\Repositories\UrlNotificationRepository;
  * @method static self props($alias = null, $force = null)
  * @method UrlNotificationRepository repository()
  */
-class UrlNotificationEntityModel extends BaseEntityModel
+final class UrlNotificationEntityModel extends BaseEntityModel
 {
     use UrlNotificationProps;
 

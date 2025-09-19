@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Repositories;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +21,7 @@ use Modules\MercadoPago\Models\PaymentModel;
  * @method PaymentModel firstOrNew(Builder|\Illuminate\Database\Query\Builder $query)
  * @method PaymentModel findOrFail($id)
  */
-class PaymentRepository extends BaseRepository
+final class PaymentRepository extends BaseRepository
 {
     /**
      * {@inheritDoc}

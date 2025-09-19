@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Entities\Preference;
 
 use Modules\Base\Entities\BaseEntityModel;
@@ -18,7 +20,7 @@ use Modules\MercadoPago\Repositories\PreferenceRepository;
  * @method static self props($alias = null, $force = null)
  * @method PreferenceRepository repository()
  */
-class PreferenceEntityModel extends BaseEntityModel
+final class PreferenceEntityModel extends BaseEntityModel
 {
     use PreferenceProps;
 

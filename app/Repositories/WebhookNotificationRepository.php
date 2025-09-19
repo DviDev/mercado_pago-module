@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Repositories;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -20,7 +22,7 @@ use Modules\MercadoPago\Models\WebhookNotificationModel;
  * @method WebhookNotificationModel firstOrNew(Builder|\Illuminate\Database\Query\Builder $query)
  * @method WebhookNotificationEntityModel findOrFail($id)
  */
-class WebhookNotificationRepository extends BaseRepository
+final class WebhookNotificationRepository extends BaseRepository
 {
     /**
      * {@inheritDoc}

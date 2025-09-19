@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,7 +25,7 @@ use Modules\Store\Models\OrderModel;
  *
  * @method PaymentEntityModel toEntity()
  */
-class PaymentModel extends BaseModel
+final class PaymentModel extends BaseModel
 {
     use PaymentProps;
 
@@ -34,17 +36,17 @@ class PaymentModel extends BaseModel
         return self::dbTable('mp_payments', $alias);
     }
 
-    public static function getByMpId(string $id): ?PaymentModel
+    public static function getByMpId(string $id): ?self
     {
         $p = PaymentEntityModel::props();
 
         return self::where($p->mp_id, $id)->get()->first();
     }
 
-    public static function makeViaApiData(mixed $data): PaymentModel
+    public static function makeViaApiData(mixed $data): self
     {
         $p = PaymentEntityModel::props(null, true);
-        $payment = new PaymentModel;
+        $payment = new self;
         $payment->mp_id = $data[$p->id];
         $payment->external_reference = $data[$p->external_reference];
         $payment->collector_id = $data[$p->collector_id];
@@ -64,9 +66,9 @@ class PaymentModel extends BaseModel
         return $payment;
     }
 
-    public static function criaViaPaymentMercadoPago(Payment $payment, $order_id): ?PaymentModel
+    public static function criaViaPaymentMercadoPago(Payment $payment, $order_id): ?self
     {
-        if (PaymentModel::query()->where(['mp_id' => $payment->id])->exists()) {
+        if (self::query()->where(['mp_id' => $payment->id])->exists()) {
             return null;
         }
 
@@ -96,7 +98,7 @@ class PaymentModel extends BaseModel
             $p->external_reference => $payment->external_reference,
             $p->transaction_details_digitable_line => $payment->transaction_details->digitable_line ?? null,
         ];
-        if ($payment->payment_type_id == 'ticket') {
+        if ($payment->payment_type_id === 'ticket') {
             if ($barcode = $payment->transaction_details->barcode) {
                 if (is_object($barcode)) {
                     /** @var Payment\Barcode $barcode */
@@ -107,15 +109,7 @@ class PaymentModel extends BaseModel
             }
         }
 
-        return PaymentModel::create($data);
-    }
-
-    protected static function newFactory(): BaseFactory
-    {
-        return new class extends BaseFactory
-        {
-            protected $model = PaymentModel::class;
-        };
+        return self::create($data);
     }
 
     public function modelEntity(): string
@@ -157,5 +151,13 @@ class PaymentModel extends BaseModel
     public function card(): HasOne
     {
         return $this->hasOne(PaymentCardModel::class, 'payment_id');
+    }
+
+    protected static function newFactory(): BaseFactory
+    {
+        return new class extends BaseFactory
+        {
+            protected $model = PaymentModel::class;
+        };
     }
 }

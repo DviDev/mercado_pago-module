@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Listeners;
 
 use Modules\MercadoPago\Entities\PreprefenceItem\PreferenceItemDTO;
 use Modules\MercadoPago\Models\PreferenceModel;
 use Modules\Store\Events\OrderWithItemsCreatedEvent;
 
-class CreatePreferenceListener
+final class CreatePreferenceListener
 {
     public function handle(OrderWithItemsCreatedEvent $event): void
     {

@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Services;
 
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Payment\PaymentClient;
@@ -11,7 +14,7 @@ use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Resources\Payment;
 use Modules\MercadoPago\Models\PaymentModel;
 
-class PaymentService
+final class PaymentService
 {
     public static function createBoleto(
         $order_id,
@@ -61,7 +64,7 @@ class PaymentService
             return $client->create($request, $request_options);
         } catch (MPApiException $exception) {
             $content = $exception->getApiResponse()->getContent();
-            throw new \Exception(json_encode($content));
+            throw new Exception(json_encode($content));
         }
     }
 
@@ -78,7 +81,7 @@ class PaymentService
         return $payment;
     }
 
-    protected static function generatePix(
+    private static function generatePix(
         $idempotency_key,
         $customer_name,
         $amount,

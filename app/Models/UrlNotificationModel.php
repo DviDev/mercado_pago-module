@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Models;
 
 use Modules\Base\Contracts\BaseModel;
@@ -14,7 +16,7 @@ use Modules\MercadoPago\Entities\UrlNotification\UrlNotificationProps;
  *
  * @method UrlNotificationEntityModel toEntity()
  */
-class UrlNotificationModel extends BaseModel
+final class UrlNotificationModel extends BaseModel
 {
     use UrlNotificationProps;
 
@@ -37,16 +39,16 @@ class UrlNotificationModel extends BaseModel
         return self::dbTable('mp_back_url_notifications', $alias);
     }
 
+    public function modelEntity(): string
+    {
+        return UrlNotificationEntityModel::class;
+    }
+
     protected static function newFactory(): BaseFactory
     {
         return new class extends BaseFactory
         {
             protected $model = UrlNotificationModel::class;
         };
-    }
-
-    public function modelEntity(): string
-    {
-        return UrlNotificationEntityModel::class;
     }
 }

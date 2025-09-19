@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Repositories;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -20,7 +22,7 @@ use Modules\MercadoPago\Models\PreferenceModel;
  * @method PreferenceModel firstOrNew(Builder|\Illuminate\Database\Query\Builder $query)
  * @method PreferenceEntityModel findOrFail($id)
  */
-class PreferenceRepository extends BaseRepository
+final class PreferenceRepository extends BaseRepository
 {
     /**
      * {@inheritDoc}

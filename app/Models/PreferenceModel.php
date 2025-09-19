@@ -1,8 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Models;
 
+use DB;
+use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use InvalidArgumentException;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
@@ -23,7 +28,7 @@ use Modules\Store\Models\OrderModel;
  *
  * @method PreferenceEntityModel toEntity()
  */
-class PreferenceModel extends BaseModel
+final class PreferenceModel extends BaseModel
 {
     use PreferenceProps;
 
@@ -34,29 +39,11 @@ class PreferenceModel extends BaseModel
         return self::dbTable('mp_preferences', $alias);
     }
 
-    public static function getByStringId($id): ?PreferenceModel
+    public static function getByStringId($id): ?self
     {
         return self::whereFn(fn (PreferenceEntityModel $p) => [
             [$p->mp_preference_id, $id],
         ])->first();
-    }
-
-    protected static function newFactory(): BaseFactory
-    {
-        return new class extends BaseFactory
-        {
-            protected $model = PreferenceModel::class;
-        };
-    }
-
-    public function modelEntity(): string
-    {
-        return PreferenceEntityModel::class;
-    }
-
-    public function order(): BelongsTo
-    {
-        return $this->belongsTo(OrderModel::class, 'order_id');
     }
 
     /**
@@ -71,20 +58,20 @@ class PreferenceModel extends BaseModel
         array $items,
         array $excluded_payment_methods = [],
         array $excluded_payment_types = []
-    ): ?PreferenceModel {
+    ): ?self {
         if (! config('mercadopago.enable')) {
             return null;
         }
 
         foreach ($items as $item) {
             if (! $item instanceof PreferenceItemDTO) {
-                throw new \InvalidArgumentException(__('mercadopago::preference.All items must be instances of ', ['class' => PreferenceItemDTO::class]));
+                throw new InvalidArgumentException(__('mercadopago::preference.All items must be instances of ', ['class' => PreferenceItemDTO::class]));
             }
         }
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
-            $preference = new PreferenceModel;
+            $preference = new self;
             $preference->user_id = auth()->user()->id;
             $preference->order_id = $order->id;
             $preference->save();
@@ -122,17 +109,35 @@ class PreferenceModel extends BaseModel
             $preference->client_id = $mp_preference->client_id;
             $preference->save();
 
-            \DB::commit();
+            DB::commit();
 
             return $preference;
         } catch (MPApiException $exception) {
-            throw new \Exception(
+            throw new Exception(
                 message: collect($exception->getApiResponse()->getContent())->join(PHP_EOL),
                 code: $exception->getApiResponse()->getStatusCode(),
                 previous: $exception);
-        } catch (\Exception $exception) {
-            \DB::rollBack();
+        } catch (Exception $exception) {
+            DB::rollBack();
             throw $exception;
         }
+    }
+
+    public function modelEntity(): string
+    {
+        return PreferenceEntityModel::class;
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(OrderModel::class, 'order_id');
+    }
+
+    protected static function newFactory(): BaseFactory
+    {
+        return new class extends BaseFactory
+        {
+            protected $model = PreferenceModel::class;
+        };
     }
 }

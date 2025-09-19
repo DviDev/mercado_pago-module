@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Domains;
 
+use Closure;
 use Illuminate\Support\Facades\Log;
 use Modules\Base\Domain\BaseDomain;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
@@ -25,7 +28,7 @@ use Modules\Store\Models\OrderStatusModel;
  *
  * @method PaymentRepository repository()
  */
-class PaymentDomain extends BaseDomain
+final class PaymentDomain extends BaseDomain
 {
     public function repositoryClass(): string
     {
@@ -65,7 +68,7 @@ class PaymentDomain extends BaseDomain
         if (in_array($paymentDB->status, [OrderStatusTypeEnum::paid, OrderStatusTypeEnum::rejected])) {
             return;
         }
-        if ($paymentDB->status == OrderStatusTypeEnum::in_process->name && $paymentData->status !==
+        if ($paymentDB->status === OrderStatusTypeEnum::in_process->name && $paymentData->status !==
             OrderStatusTypeEnum::in_process->name) {
             $paymentDB->status = $paymentData->status;
             $paymentDB->status_detail = $paymentData->status_detail;
@@ -101,14 +104,14 @@ class PaymentDomain extends BaseDomain
         Log::info('FIM de checkWebhookNotifications');
     }
 
-    public function checkPaymentsOrderId(\Closure $fn)
+    public function checkPaymentsOrderId(Closure $fn)
     {
         Log::info('-- Pagamentos(mp) que precisam atualizar id do pedido');
         $p = PaymentEntityModel::props();
         $builder = PaymentModel::query()
             ->whereDate($p->date_created, '>=', '2023-03-20')
             ->orderBy($p->id);
-        if ($builder->count() == 0) {
+        if ($builder->count() === 0) {
             Log::info('-- Não há ocorrências');
 
             return;
@@ -132,7 +135,7 @@ class PaymentDomain extends BaseDomain
         Log::info(str_pad('-- ', 100, '-'));
     }
 
-    public function clearDuplicatePayments(\Closure $fn)
+    public function clearDuplicatePayments(Closure $fn)
     {
         Log::info('-- Eliminar pgtos duplicados');
 
@@ -141,7 +144,7 @@ class PaymentDomain extends BaseDomain
             ->select($p->order_id)
             ->groupBy($p->order_id)
             ->orderBy($p->order_id);
-        if ($builder->count() == 0) {
+        if ($builder->count() === 0) {
             Log::info('-- Não há ocorrências');
 
             return;
@@ -153,13 +156,13 @@ class PaymentDomain extends BaseDomain
                 ->where($p->order_id, $model->order_id)
                 ->groupBy([$p->mp_id, $p->status])
                 ->get()->modelKeys();
-            if (count($white_list_ids) == 0) {
+            if (count($white_list_ids) === 0) {
                 return;
             }
 
             $ids = PaymentModel::query()->where($p->order_id, $model->order_id)
                 ->whereNotIn($p->id, $white_list_ids)->get()->modelKeys();
-            if (count($ids) == 0) {
+            if (count($ids) === 0) {
                 return;
             }
 
@@ -177,7 +180,7 @@ class PaymentDomain extends BaseDomain
         Log::info(str_pad('-- ', 100, '-'));
     }
 
-    public function checkPaymentStatusVsOrderLastStatus(?\Closure $fn = null)
+    public function checkPaymentStatusVsOrderLastStatus(?Closure $fn = null)
     {
         Log::info('-- Verificando status do pgto(mp) com ultimo status do pedido');
 
@@ -194,45 +197,45 @@ class PaymentDomain extends BaseDomain
                     ->orderByDesc($paymentProps->created_at)
                     ->limit(1)->get()
                     ->each(function (PaymentModel $payment) use ($paymentProps, $fn, &$ocurrences) {
-                        if ($payment->status == 'approved' && $payment->order->lastStatusEnum() !== OrderStatusTypeEnum::paid) {
+                        if ($payment->status === 'approved' && $payment->order->lastStatusEnum() !== OrderStatusTypeEnum::paid) {
                             $ocurrences[$payment->order_id] = true;
                             $fn($payment, $paymentProps);
 
                             return;
                         }
-                        if ($payment->status == 'pending' && $payment->order->lastStatusEnum() !== OrderStatusTypeEnum::pendent) {
+                        if ($payment->status === 'pending' && $payment->order->lastStatusEnum() !== OrderStatusTypeEnum::pendent) {
                             $ocurrences[$payment->order_id] = true;
                             $fn($payment, $paymentProps);
 
                             return;
                         }
-                        if ($payment->status == 'rejected' && $payment->order->lastStatusEnum() !== OrderStatusTypeEnum::rejected) {
+                        if ($payment->status === 'rejected' && $payment->order->lastStatusEnum() !== OrderStatusTypeEnum::rejected) {
                             $ocurrences[$payment->order_id] = true;
                             $fn($payment, $paymentProps);
 
                             return;
                         }
-                        if ($payment->status == 'in_process' &&
+                        if ($payment->status === 'in_process' &&
                             ($payment->order->lastStatusEnum() !== OrderStatusTypeEnum::in_process)) {
                             $ocurrences[$payment->order_id] = true;
                             $fn($payment, $paymentProps);
 
                             return;
                         }
-                        if ($payment->status == 'cancelled' &&
+                        if ($payment->status === 'cancelled' &&
                             ($payment->order->lastStatusEnum() !== OrderStatusTypeEnum::canceled)) {
                             $ocurrences[$payment->order_id] = true;
                             $fn($payment, $paymentProps);
                         }
                     });
             });
-        if (count($ocurrences) == 0) {
+        if (count($ocurrences) === 0) {
             Log::info('-- Não há ocorrência');
         }
         Log::info(str_pad('-- ', 100, '-'));
     }
 
-    public function checkOrderStatusWithDuplicatedPaidStatus(\Closure $fn)
+    public function checkOrderStatusWithDuplicatedPaidStatus(Closure $fn)
     {
         Log::info('-- Verificando pedidos com status de pago duplicados');
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Services;
 
 use App\Models\User;
@@ -11,7 +13,7 @@ use Modules\Store\Entities\OrderStatusType\OrderStatusTypeEnum;
 use Modules\Store\Models\OrderModel;
 use Modules\Store\Notifications\NotificationInvoice;
 
-class OrderStatusService
+final class OrderStatusService
 {
     public function __construct(
         public ?PaymentModel $payment = null,
@@ -61,42 +63,6 @@ class OrderStatusService
         return false;
     }
 
-    private function canceled(): bool
-    {
-        if ($this->payment->status !== OrderStatusTypeEnum::canceled->name) {
-            return false;
-        }
-
-        $order = $this->payment->order;
-        if ($order->isLastStatus(OrderStatusTypeEnum::canceled)) {
-            return false;
-        }
-
-        $description = $this->payment->getDescription();
-        $this->addStatus($order, OrderStatusTypeEnum::canceled, $description);
-
-        $this->notify($order, 'O pagamento foi cancelado', $description);
-
-        return true;
-    }
-
-    protected function addStatus(OrderModel $order, $status, ?string $description)
-    {
-        return $order->addStatus($status, $description);
-    }
-
-    protected function notify(OrderModel $order, ?string $title, ?string $description = null): void
-    {
-        if (config('base.local_testing_production') == true) {
-            return;
-        }
-        $notificaton = $this->notification ?? new NotificationInvoice($order);
-        $notificaton->title = $title;
-        $notificaton->description = $description;
-
-        $order->user->notify($notificaton);
-    }
-
     public function pending(): bool
     {
         if ($this->payment->status !== 'pending') {
@@ -114,69 +80,6 @@ class OrderStatusService
         $this->addStatus($order, OrderStatusTypeEnum::in_process, $description);
 
         $this->notify($order, 'Estamos aguardando o pagamento!', $description);
-
-        return true;
-    }
-
-    protected function inProcess(): bool
-    {
-        if ($this->payment->status != OrderStatusTypeEnum::in_process->name) {
-            return false;
-        }
-
-        $order = $this->payment->order;
-        if ($order->isLastStatus(OrderStatusTypeEnum::in_process)) {
-            return false;
-        }
-
-        $this->addStatus($order, OrderStatusTypeEnum::in_process, 'O pagamento está sendo processado');
-
-        $this->notify(
-            $order,
-            'Estamos processando seu pagamento',
-            'Informaremos em breve por e-mail se foi aprovado.'
-        );
-
-        return true;
-    }
-
-    protected function reject(): bool
-    {
-        if ($this->payment->status !== OrderStatusTypeEnum::rejected->name) {
-            return false;
-        }
-
-        $order = $this->payment->order;
-
-        if ($order->isLastStatus(OrderStatusTypeEnum::rejected)) {
-            return false;
-        }
-
-        $description = $this->payment->getDescription();
-        $this->addStatus($order, OrderStatusTypeEnum::rejected, $description);
-
-        $this->notify($order, 'O pagamento foi rejeitado');
-
-        return true;
-    }
-
-    protected function approved(): bool
-    {
-        if ($this->payment->status !== 'approved') {
-            return false;
-        }
-
-        $order = $this->payment->order;
-        if ($order->lastStatus() && $order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
-            Log::info("A ordem $order->id já está paga.");
-
-            return true;
-        }
-
-        $description = $this->payment->getDescription();
-        $this->addStatus($order, OrderStatusTypeEnum::paid, $description);
-
-        $this->notify($order, 'O pagamento da ordem '.$order->id.' no valor de '.$this->payment->transaction_amount.' foi aprovado!', $description);
 
         return true;
     }
@@ -222,5 +125,104 @@ class OrderStatusService
         ]);
 
         return $payment;
+    }
+
+    private function canceled(): bool
+    {
+        if ($this->payment->status !== OrderStatusTypeEnum::canceled->name) {
+            return false;
+        }
+
+        $order = $this->payment->order;
+        if ($order->isLastStatus(OrderStatusTypeEnum::canceled)) {
+            return false;
+        }
+
+        $description = $this->payment->getDescription();
+        $this->addStatus($order, OrderStatusTypeEnum::canceled, $description);
+
+        $this->notify($order, 'O pagamento foi cancelado', $description);
+
+        return true;
+    }
+
+    private function addStatus(OrderModel $order, $status, ?string $description)
+    {
+        return $order->addStatus($status, $description);
+    }
+
+    private function notify(OrderModel $order, ?string $title, ?string $description = null): void
+    {
+        if (config('base.local_testing_production') === true) {
+            return;
+        }
+        $notificaton = $this->notification ?? new NotificationInvoice($order);
+        $notificaton->title = $title;
+        $notificaton->description = $description;
+
+        $order->user->notify($notificaton);
+    }
+
+    private function inProcess(): bool
+    {
+        if ($this->payment->status !== OrderStatusTypeEnum::in_process->name) {
+            return false;
+        }
+
+        $order = $this->payment->order;
+        if ($order->isLastStatus(OrderStatusTypeEnum::in_process)) {
+            return false;
+        }
+
+        $this->addStatus($order, OrderStatusTypeEnum::in_process, 'O pagamento está sendo processado');
+
+        $this->notify(
+            $order,
+            'Estamos processando seu pagamento',
+            'Informaremos em breve por e-mail se foi aprovado.'
+        );
+
+        return true;
+    }
+
+    private function reject(): bool
+    {
+        if ($this->payment->status !== OrderStatusTypeEnum::rejected->name) {
+            return false;
+        }
+
+        $order = $this->payment->order;
+
+        if ($order->isLastStatus(OrderStatusTypeEnum::rejected)) {
+            return false;
+        }
+
+        $description = $this->payment->getDescription();
+        $this->addStatus($order, OrderStatusTypeEnum::rejected, $description);
+
+        $this->notify($order, 'O pagamento foi rejeitado');
+
+        return true;
+    }
+
+    private function approved(): bool
+    {
+        if ($this->payment->status !== 'approved') {
+            return false;
+        }
+
+        $order = $this->payment->order;
+        if ($order->lastStatus() && $order->lastStatusEnum() === OrderStatusTypeEnum::paid) {
+            Log::info("A ordem $order->id já está paga.");
+
+            return true;
+        }
+
+        $description = $this->payment->getDescription();
+        $this->addStatus($order, OrderStatusTypeEnum::paid, $description);
+
+        $this->notify($order, 'O pagamento da ordem '.$order->id.' no valor de '.$this->payment->transaction_amount.' foi aprovado!', $description);
+
+        return true;
     }
 }
