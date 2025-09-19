@@ -28,7 +28,7 @@ use Modules\Store\Models\OrderModel;
 use Modules\Store\Notifications\NotificationInvoice;
 use Modules\Store\Repositories\OrderRepository;
 
-final class PaymentStatusController extends Controller
+class PaymentStatusController extends Controller
 {
     protected ?PaymentModel $payment;
 
