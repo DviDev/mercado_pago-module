@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Listeners;
 
 use Modules\Base\Contracts\BaseTranslateViewElementPropertiesListener;
 
-class TranslateViewElementPropertiesMercadoPagoListener extends BaseTranslateViewElementPropertiesListener
+final class TranslateViewElementPropertiesMercadoPagoListener extends BaseTranslateViewElementPropertiesListener
 {
     protected function moduleName(): string
     {
@@ -13,6 +15,6 @@ class TranslateViewElementPropertiesMercadoPagoListener extends BaseTranslateVie
 
     protected function moduleNameLower(): string
     {
-        return strtolower(config('mercadopago.name'));
+        return mb_strtolower(config('mercadopago.name'));
     }
 }

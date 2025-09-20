@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\View\Components\Buttons;
 
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
-class Button extends Component
+final class Button extends Component
 {
     /**
      * Create a new component instance.

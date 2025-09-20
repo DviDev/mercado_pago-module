@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Listeners;
 
 use Modules\Project\Contracts\DefineSearchableAttributesContract;
 
-class DefineSearchableMercadoPagoAttributes extends DefineSearchableAttributesContract
+final class DefineSearchableMercadoPagoAttributes extends DefineSearchableAttributesContract
 {
     protected function moduleName(): string
     {
         return config('mercadopago.name');
     }
 
-    public function searchableFields(): array
+    protected function searchableFields(): array
     {
         return [];
     }

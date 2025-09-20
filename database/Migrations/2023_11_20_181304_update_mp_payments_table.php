@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +14,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('mp_payments', function (Blueprint $table) {
+        Schema::table('mp_payments', function (Blueprint $table): void {
             $p = PaymentEntityModel::props(force: true);
             $table->string($p->point_of_interaction_type);
             $table->string($p->point_of_interaction_transaction_qr_code)->nullable();
@@ -28,7 +30,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('mp_payments', function (Blueprint $table) {
+        Schema::table('mp_payments', function (Blueprint $table): void {
             $table->dropColumn('point_of_interaction_type');
             $table->dropColumn('point_of_interaction_transaction_qr_code');
             $table->dropColumn('point_of_interaction_transaction_ticket_url');

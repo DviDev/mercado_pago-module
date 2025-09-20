@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -9,7 +11,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('mp_webhook_notifications', function (Blueprint $table) {
+        Schema::create('mp_webhook_notifications', function (Blueprint $table): void {
             $p = WebhookNotificationEntityModel::props(null, true);
             $table->id();
             $table->string($p->action)->nullable();

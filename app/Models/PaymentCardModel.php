@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Models;
 
 use Modules\Base\Contracts\BaseModel;
@@ -16,7 +18,7 @@ use Modules\MercadoPago\Entities\PaymentCard\PaymentCardProps;
  *
  * @method PaymentCardEntityModel toEntity()
  */
-class PaymentCardModel extends BaseModel
+final class PaymentCardModel extends BaseModel
 {
     use PaymentCardProps;
 
@@ -25,16 +27,16 @@ class PaymentCardModel extends BaseModel
         return self::dbTable('mp_payment_cards', $alias);
     }
 
+    public function modelEntity(): string
+    {
+        return PaymentCardEntityModel::class;
+    }
+
     protected static function newFactory(): BaseFactory
     {
         return new class extends BaseFactory
         {
             protected $model = PaymentCardModel::class;
         };
-    }
-
-    public function modelEntity(): string
-    {
-        return PaymentCardEntityModel::class;
     }
 }

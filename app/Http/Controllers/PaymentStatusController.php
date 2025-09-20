@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Http\Controllers;
 
 use Exception;
@@ -32,11 +34,11 @@ class PaymentStatusController extends Controller
 
     protected WebhookNotificationModel|Builder $WebhookNotification;
 
-    private UrlNotificationModel $UrlNotification;
-
     protected NotificationInvoice $paymentNotification;
 
     protected ?OrderModel $orderModel;
+
+    private UrlNotificationModel $UrlNotification;
 
     public function payment()
     {
@@ -53,7 +55,7 @@ class PaymentStatusController extends Controller
         }
 
         // when check url in webhook portal of mp
-        if ($data['type'] == 'test') {
+        if ($data['type'] === 'test') {
             return response()->json(true);
         }
 
@@ -90,7 +92,7 @@ class PaymentStatusController extends Controller
 
                 $orderStatusService = new OrderStatusService(payment: $this->payment, notification: $this->paymentNotification);
                 if ($orderStatusService->checkStatus()) {
-                    if ($this->payment->status == 'approved') {
+                    if ($this->payment->status === 'approved') {
                         CartModel::clearOrderItems($this->orderModel);
                     }
 
@@ -107,7 +109,7 @@ class PaymentStatusController extends Controller
             Log::error('Api data: '.json_encode($api_data));
 
             return response()->json(true);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error('Erro ao processar webhook do mercado pago');
             Log::info(json_encode($data));
             Log::info($exception->getMessage().' in '.$exception->getFile().' line '.$exception->getLine());
@@ -116,6 +118,131 @@ class PaymentStatusController extends Controller
             // Se chegou até aqui o problema não é mais do mercado pago é do nosso processamento que precisa ser
             // analisado em outro momento
             return response(true);
+        }
+    }
+
+    public function success(OrderModel $order)
+    {
+        $data = collect(request()->all())->map(fn ($value) => $value === 'null' ? null : $value)->all();
+        $data['preference_id'] = PreferenceModel::getByStringId($data['preference_id'])->id;
+        $this->UrlNotification = UrlNotificationModel::query()->create($data);
+
+        try {
+            if (! $this->createPayment($order, $data['payment_id'])) {
+                session()->flash('error', 'Não foi possível se comunicar com o sistema de pagamentos. Aguarde.');
+                session()->flash('only_toastr');
+
+                return redirect()->route('order', $order->id);
+            }
+
+            if ($order->lastStatusEnum() === OrderStatusTypeEnum::paid) {
+                return redirect()->route('order', $order->id);
+            }
+
+            if ($this->payment->status === 'approved') {
+                DB::beginTransaction();
+
+                if ($order->lastStatusEnum() === OrderStatusTypeEnum::awaiting_payment) {
+                    $status = $order->addStatus(OrderStatusTypeEnum::paid);
+                    $status->payment_type_id = PaymentTypeEnum::card->value;
+                    $status->save();
+                }
+
+                Notification::send(auth()->user(), new NotificationInvoice($order));
+
+                $preference = $this->payment->order->preference;
+                $preference->notification_id = $this->UrlNotification->id;
+                $preference->save();
+
+                $this->clearCartItems();
+
+                DB::commit();
+
+                session()->flash('success', 'Parabéns seus pagamento foi aprovado.');
+
+                return redirect()->route('order', $order->id);
+            }
+        } catch (Exception $exception) {
+            DB::rollBack();
+            if (config('app.env') === 'local') {
+                session()->flash('error', 'O pagamento não pode ser aprovado.');
+
+                throw $exception;
+            }
+
+            return redirect()->route('order', $order->id);
+        }
+    }
+
+    public function pending(OrderModel $order)
+    {
+        try {
+            DB::beginTransaction();
+
+            $data = request()->all();
+            $preference = $this->getPreference($data['preference_id']);
+
+            $data['preference_id'] = $preference->id;
+            $this->createUrlNotification($data);
+
+            if ($order->payment->id) {
+                DB::commit();
+
+                return redirect()->route('store.store_orders.list');
+            }
+            if (! $this->payment = PaymentModel::getByMpId($data['payment_id'])) {
+                $this->createPayment($order, $data['payment_id']);
+            }
+            $this->payment->save();
+
+            $this->inProcess();
+
+            DB::commit();
+
+            session()->flash('success', 'O pedido está sendo processado.');
+
+            return redirect()->route('order', $this->payment->order->id);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw_if(config('app.env') === 'local', $exception);
+
+            session()->flash('error', 'Houve um problema no processamento do pedido. Aguarde.');
+            Log::error('Order pending: status:'.OrderStatusTypeEnum::in_process->name.$exception->getMessage());
+
+            return redirect()->route('store.store_orders.list');
+        }
+    }
+
+    public function failure(OrderModel $order)
+    {
+        $data = collect(request()->all())->map(fn ($value) => $value === 'null' ? null : $value)->all();
+        $preference = $this->getPreference($data['preference_id']);
+        $data['preference_id'] = $preference->id;
+
+        $this->createUrlNotification($data);
+
+        $this->createPayment($order, $data['payment_id']);
+
+        if ($this->payment->status === 'rejected') {
+            try {
+                DB::beginTransaction();
+
+                if ($order->lastStatusEnum() !== OrderStatusTypeEnum::rejected) {
+                    $this->reject();
+                }
+
+                $this->clearCartItems();
+
+                DB::commit();
+
+                session()->flash('error', $this->payment->getDescription().'. Tente novamente');
+
+                return redirect()->route('order', $order->id);
+            } catch (Exception $exception) {
+                DB::rollBack();
+
+                throw_if(config('app.env') === 'local', $exception);
+            }
         }
     }
 
@@ -158,7 +285,7 @@ class PaymentStatusController extends Controller
             return $data->json();
         }
         $msg = "MercadoPago: Registro {$this->WebhookNotification->data_id} não encontrado.";
-        if (config('app.env') == 'local') {
+        if (config('app.env') === 'local') {
             $msg .= ' token:'.config('mercadopago.access_token');
         }
         throw new Exception($msg);
@@ -200,103 +327,11 @@ class PaymentStatusController extends Controller
         return true;
     }
 
-    public function success(OrderModel $order)
-    {
-        $data = collect(request()->all())->map(fn ($value) => $value == 'null' ? null : $value)->all();
-        $data['preference_id'] = PreferenceModel::getByStringId($data['preference_id'])->id;
-        $this->UrlNotification = UrlNotificationModel::query()->create($data);
-
-        try {
-            if (! $this->createPayment($order, $data['payment_id'])) {
-                session()->flash('error', 'Não foi possível se comunicar com o sistema de pagamentos. Aguarde.');
-                session()->flash('only_toastr');
-
-                return redirect()->route('order', $order->id);
-            }
-
-            if ($order->lastStatusEnum() == OrderStatusTypeEnum::paid) {
-                return redirect()->route('order', $order->id);
-            }
-
-            if ($this->payment->status == 'approved') {
-                DB::beginTransaction();
-
-                if ($order->lastStatusEnum() == OrderStatusTypeEnum::awaiting_payment) {
-                    $status = $order->addStatus(OrderStatusTypeEnum::paid);
-                    $status->payment_type_id = PaymentTypeEnum::card->value;
-                    $status->save();
-                }
-
-                Notification::send(auth()->user(), new NotificationInvoice($order));
-
-                $preference = $this->payment->order->preference;
-                $preference->notification_id = $this->UrlNotification->id;
-                $preference->save();
-
-                $this->clearCartItems();
-
-                DB::commit();
-
-                session()->flash('success', 'Parabéns seus pagamento foi aprovado.');
-
-                return redirect()->route('order', $order->id);
-            }
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            if (config('app.env') == 'local') {
-                session()->flash('error', 'O pagamento não pode ser aprovado.');
-
-                throw $exception;
-            }
-
-            return redirect()->route('order', $order->id);
-        }
-    }
-
     protected function clearCartItems(): void
     {
-        CartModel::getByLoggedUser()->items()->each(function (CartItemModel $cartItem) {
+        CartModel::getByLoggedUser()->items()->each(function (CartItemModel $cartItem): void {
             $cartItem->delete();
         });
-    }
-
-    public function pending(OrderModel $order)
-    {
-        try {
-            DB::beginTransaction();
-
-            $data = request()->all();
-            $preference = $this->getPreference($data['preference_id']);
-
-            $data['preference_id'] = $preference->id;
-            $this->createUrlNotification($data);
-
-            if ($order->payment->id) {
-                DB::commit();
-
-                return redirect()->route('store.store_orders.list');
-            }
-            if (! $this->payment = PaymentModel::getByMpId($data['payment_id'])) {
-                $this->createPayment($order, $data['payment_id']);
-            }
-            $this->payment->save();
-
-            $this->inProcess();
-
-            DB::commit();
-
-            session()->flash('success', 'O pedido está sendo processado.');
-
-            return redirect()->route('order', $this->payment->order->id);
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            throw_if(config('app.env') == 'local', $exception);
-
-            session()->flash('error', 'Houve um problema no processamento do pedido. Aguarde.');
-            Log::error('Order pending: status:'.OrderStatusTypeEnum::in_process->name.$exception->getMessage());
-
-            return redirect()->route('store.store_orders.list');
-        }
     }
 
     protected function getPreference($preference_id): PreferenceModel
@@ -318,11 +353,11 @@ class PaymentStatusController extends Controller
 
     protected function inProcess(): bool
     {
-        if ($this->payment->status != 'in_process') {
+        if ($this->payment->status !== 'in_process') {
             return false;
         }
 
-        if ($this->payment->order->lastStatusEnum() == OrderStatusTypeEnum::in_process) {
+        if ($this->payment->order->lastStatusEnum() === OrderStatusTypeEnum::in_process) {
             return true;
         }
 
@@ -335,39 +370,6 @@ class PaymentStatusController extends Controller
         ));
 
         return true;
-    }
-
-    public function failure(OrderModel $order)
-    {
-        $data = collect(request()->all())->map(fn ($value) => $value == 'null' ? null : $value)->all();
-        $preference = $this->getPreference($data['preference_id']);
-        $data['preference_id'] = $preference->id;
-
-        $this->createUrlNotification($data);
-
-        $this->createPayment($order, $data['payment_id']);
-
-        if ($this->payment->status == 'rejected') {
-            try {
-                DB::beginTransaction();
-
-                if ($order->lastStatusEnum() !== OrderStatusTypeEnum::rejected) {
-                    $this->reject();
-                }
-
-                $this->clearCartItems();
-
-                DB::commit();
-
-                session()->flash('error', $this->payment->getDescription().'. Tente novamente');
-
-                return redirect()->route('order', $order->id);
-            } catch (\Exception $exception) {
-                DB::rollBack();
-
-                throw_if(config('app.env') == 'local', $exception);
-            }
-        }
     }
 
     protected function reject(): bool
@@ -453,7 +455,7 @@ class PaymentStatusController extends Controller
         foreach ($parts as $part) {
             // Split each part into key and value
             $keyValue = explode('=', $part, 2);
-            if (count($keyValue) == 2) {
+            if (count($keyValue) === 2) {
                 $key = trim($keyValue[0]);
                 $value = trim($keyValue[1]);
                 if ($key === 'ts') {

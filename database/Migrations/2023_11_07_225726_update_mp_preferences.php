@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -9,7 +11,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('mp_preferences', function (Blueprint $table) {
+        Schema::table('mp_preferences', function (Blueprint $table): void {
             $p = PreferenceEntityModel::props(force: true);
             $table->string($p->mp_preference_id)->nullable()->change();
             $table->string($p->collector_id)->nullable()->change();
@@ -20,6 +22,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::table('', function (Blueprint $table) {});
+        Schema::table('', function (Blueprint $table): void {});
     }
 };

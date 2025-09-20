@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Providers;
 
+use Event;
 use Modules\Base\Contracts\BaseServiceProviderContract;
 use Modules\DBMap\Events\ScanTableEvent;
 use Modules\MercadoPago\Listeners\CreateMenuItemsMercadoPagoListener;
@@ -14,7 +17,7 @@ use Modules\Store\Events\OrderWithItemsCreatedEvent;
 use Modules\View\Events\DefineSearchableAttributesEvent;
 use Modules\View\Events\ElementPropertyCreatingEvent;
 
-class MercadoPagoServiceProvider extends BaseServiceProviderContract
+final class MercadoPagoServiceProvider extends BaseServiceProviderContract
 {
     public function provides(): array
     {
@@ -35,10 +38,10 @@ class MercadoPagoServiceProvider extends BaseServiceProviderContract
 
     protected function registerEvents(): void
     {
-        \Event::listen(OrderWithItemsCreatedEvent::class, CreatePreferenceListener::class);
-        \Event::listen(CreateMenuItemsEvent::class, CreateMenuItemsMercadoPagoListener::class);
-        \Event::listen(DefineSearchableAttributesEvent::class, DefineSearchableMercadoPagoAttributes::class);
-        \Event::listen(ScanTableEvent::class, ScanTableMercadoPagoListener::class);
-        \Event::listen(ElementPropertyCreatingEvent::class, TranslateViewElementPropertiesMercadoPagoListener::class);
+        Event::listen(OrderWithItemsCreatedEvent::class, CreatePreferenceListener::class);
+        Event::listen(CreateMenuItemsEvent::class, CreateMenuItemsMercadoPagoListener::class);
+        Event::listen(DefineSearchableAttributesEvent::class, DefineSearchableMercadoPagoAttributes::class);
+        Event::listen(ScanTableEvent::class, ScanTableMercadoPagoListener::class);
+        Event::listen(ElementPropertyCreatingEvent::class, TranslateViewElementPropertiesMercadoPagoListener::class);
     }
 }

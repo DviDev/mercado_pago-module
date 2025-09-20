@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Entities\Payment;
 
 use Modules\Base\Entities\BaseEntityModel;
@@ -18,7 +20,7 @@ use Modules\MercadoPago\Repositories\PaymentRepository;
  * @method static self props($alias = null, $force = null)
  * @method PaymentRepository repository()
  */
-class PaymentEntityModel extends BaseEntityModel
+final class PaymentEntityModel extends BaseEntityModel
 {
     use PaymentProps;
 

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\MercadoPago\Services;
 
 use Illuminate\Support\Facades\Http;
 
-class HttpPaymentService
+final class HttpPaymentService
 {
     public function __construct(public string $access_token) {}
 
@@ -14,7 +16,7 @@ class HttpPaymentService
             ->get('https://api.mercadopago.com/v1/payments/'.$payment_id);
     }
 
-    protected function getHeaders(): array
+    private function getHeaders(): array
     {
         return [
             'Content-Type' => 'application/json',
