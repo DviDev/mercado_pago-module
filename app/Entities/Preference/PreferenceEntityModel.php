@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\MercadoPago\Entities\Preference;
 
-use Modules\Base\Entities\BaseEntityModel;
+use Modules\Base\Contracts\BaseEntityModel;
 use Modules\MercadoPago\Models\PreferenceModel;
 use Modules\MercadoPago\Repositories\PreferenceRepository;
 

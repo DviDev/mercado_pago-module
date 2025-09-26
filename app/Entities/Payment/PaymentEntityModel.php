@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\MercadoPago\Entities\Payment;
 
-use Modules\Base\Entities\BaseEntityModel;
+use Modules\Base\Contracts\BaseEntityModel;
 use Modules\MercadoPago\Models\PaymentModel;
 use Modules\MercadoPago\Repositories\PaymentRepository;
 
