@@ -12,7 +12,7 @@ use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use Modules\Base\Contracts\BaseModel;
-use Modules\Base\Factories\BaseFactory;
+use Modules\Base\Contracts\BaseFactory;
 use Modules\MercadoPago\Entities\PaymentMethod\PaymentMethodEnum;
 use Modules\MercadoPago\Entities\Preference\PreferenceEntityModel;
 use Modules\MercadoPago\Entities\Preference\PreferenceProps;

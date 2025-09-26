@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\MercadoPago\Services;
 
-use Modules\Base\Services\HttpContract;
+use Modules\Base\Contracts\HttpContract;
 
 abstract class HttpMercadoPagoServiceContract extends HttpContract
 {
@@ -13,12 +13,12 @@ abstract class HttpMercadoPagoServiceContract extends HttpContract
         return 500;
     }
 
-    protected function url()
+    protected function url(): string
     {
         return config('mercado-pago.URL');
     }
 
-    protected function loginContract()
+    protected function loginContract(): mixed
     {
         return null;
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Modules\MercadoPago\Models;
 
 use Modules\Base\Contracts\BaseModel;
-use Modules\Base\Factories\BaseFactory;
+use Modules\Base\Contracts\BaseFactory;
 use Modules\MercadoPago\Entities\PaymentCard\PaymentCardEntityModel;
 use Modules\MercadoPago\Entities\PaymentCard\PaymentCardProps;
 
