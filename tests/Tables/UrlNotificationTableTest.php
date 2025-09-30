@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Modules\MercadoPago\Tests\Tables;
 
 use Modules\Base\Contracts\BaseModel;
-use Modules\Base\Contracts\Tests\BaseTest;
+use Modules\Base\Contracts\BaseTest;
 use Modules\MercadoPago\Models\UrlNotificationModel;
 
 final class UrlNotificationTableTest extends BaseTest
