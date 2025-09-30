@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Modules\MercadoPago\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Modules\Base\Contracts\BaseModel;
 use Modules\Base\Contracts\BaseFactory;
+use Modules\Base\Contracts\BaseModel;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationEntityModel;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationProps;
 
