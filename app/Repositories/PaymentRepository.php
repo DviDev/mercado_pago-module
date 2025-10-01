@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Modules\MercadoPago\Repositories;
 
 use Illuminate\Database\Eloquent\Builder;
-use Modules\Base\Repository\BaseRepository;
+use Modules\Base\Contracts\BaseRepository;
 use Modules\MercadoPago\Models\PaymentModel;
 
 /**

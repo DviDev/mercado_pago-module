@@ -6,7 +6,7 @@ namespace Modules\MercadoPago\Domains;
 
 use Closure;
 use Illuminate\Support\Facades\Log;
-use Modules\Base\Domain\BaseDomain;
+use Modules\Base\Contracts\BaseDomain;
 use Modules\MercadoPago\Entities\Payment\PaymentEntityModel;
 use Modules\MercadoPago\Entities\WebhookNotification\WebhookNotificationEntityModel;
 use Modules\MercadoPago\Models\PaymentModel;
