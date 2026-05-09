@@ -132,11 +132,11 @@ class PaymentStatusController extends Controller
                 session()->flash('error', 'Não foi possível se comunicar com o sistema de pagamentos. Aguarde.');
                 session()->flash('only_toastr');
 
-                return redirect()->route('order', $order->id);
+                return redirect()->route('store.order', $order->id);
             }
 
             if ($order->lastStatusEnum() === OrderStatusTypeEnum::paid) {
-                return redirect()->route('order', $order->id);
+                return redirect()->route('store.order', $order->id);
             }
 
             if ($this->payment->status === 'approved') {
@@ -160,7 +160,7 @@ class PaymentStatusController extends Controller
 
                 session()->flash('success', 'Parabéns seus pagamento foi aprovado.');
 
-                return redirect()->route('order', $order->id);
+                return redirect()->route('store.order', $order->id);
             }
         } catch (Exception $exception) {
             DB::rollBack();
@@ -170,7 +170,7 @@ class PaymentStatusController extends Controller
                 throw $exception;
             }
 
-            return redirect()->route('order', $order->id);
+            return redirect()->route('store.order', $order->id);
         }
     }
 
@@ -201,7 +201,7 @@ class PaymentStatusController extends Controller
 
             session()->flash('success', 'O pedido está sendo processado.');
 
-            return redirect()->route('order', $this->payment->order->id);
+            return redirect()->route('store.order', $this->payment->order->id);
         } catch (Exception $exception) {
             DB::rollBack();
             throw_if(config('app.env') === 'local', $exception);
@@ -237,7 +237,7 @@ class PaymentStatusController extends Controller
 
                 session()->flash('error', $this->payment->getDescription().'. Tente novamente');
 
-                return redirect()->route('order', $order->id);
+                return redirect()->route('store.order', $order->id);
             } catch (Exception $exception) {
                 DB::rollBack();
 
