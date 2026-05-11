@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return [
     'name' => 'MercadoPago',
-    'enable' => env('MERMADO_PAGO_ENABLE', false),
+    'enable' => env('MERCADO_PAGO_ENABLE', false),
     'key' => config('app.env') === 'local'
         ? env('MERCADO_PAGO_KEY')
         : env('MERCADO_PAGO_KEY_PROD'),
