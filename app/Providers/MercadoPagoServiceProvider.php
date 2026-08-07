@@ -44,4 +44,9 @@ final class MercadoPagoServiceProvider extends BaseServiceProviderContract
         Event::listen(ScanTableEvent::class, ScanTableMercadoPagoListener::class);
         Event::listen(ElementPropertyCreatingEvent::class, TranslateViewElementPropertiesMercadoPagoListener::class);
     }
+
+    protected function langPath(): string
+    {
+        return module_path($this->getModuleName(), 'resources/lang');
+    }
 }
